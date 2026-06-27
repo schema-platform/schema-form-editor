@@ -17,8 +17,9 @@ import { defineStore } from 'pinia'
 import { ref, computed, shallowRef } from 'vue'
 import type { Widget } from '../widgets/base/types'
 import { useWidgetStore } from './widget'
+import { MAX_HISTORY_SIZE } from '../composables/useConstant'
 
-const MAX_HISTORY = 30
+const MAX_HISTORY = MAX_HISTORY_SIZE
 
 /**
  * 高效深拷贝 — 使用 JSON 序列化。

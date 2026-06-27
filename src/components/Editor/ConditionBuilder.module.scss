@@ -1,15 +1,11 @@
+@use 'datasource-dialog-tokens' as *;
+
 .builder {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
 
-/* 统一表单控件高度 32px */
-.builder :global(.el-input),
-.builder :global(.el-select .el-input),
-.builder :global(.el-button:not(.is-text)) {
-  height: 32px !important;
-  min-height: 32px !important;
+  @include datasource-unified-controls;
 }
 
 .clause {

@@ -191,20 +191,19 @@ describe('validateSchema', () => {
     expect(missingErrors).toHaveLength(0)
   })
 
-  // ---------- 'search-list' type ----------
+  // ---------- 'file-list' type (NO_FIELD_TYPES) ----------
 
-  it('accepts search-list as a valid type without requiring a field', () => {
+  it('accepts file-list as a valid type without requiring a field', () => {
     const schema: PartialWidget[] = [
       {
-        type: 'search-list',
-        listApi: { url: '/api/list' },
+        type: 'file-list',
       },
     ]
     const result = validateSchema(schema)
     // No invalid-type error
     const typeErrors = result.errors.filter((e) => e.type === 'invalid-type')
     expect(typeErrors).toHaveLength(0)
-    // No missing-field error (search-list is in NO_FIELD_TYPES)
+    // No missing-field error (file-list is in NO_FIELD_TYPES)
     const missingErrors = result.errors.filter((e) => e.type === 'missing-field')
     expect(missingErrors).toHaveLength(0)
   })

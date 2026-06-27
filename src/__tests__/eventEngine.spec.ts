@@ -209,7 +209,7 @@ describe('executeEventAction', () => {
       const postMessageSpy = vi.fn()
       window.parent.postMessage = postMessageSpy
       executeEventAction({ type: 'post-message', message: { type: 'save', data: 'test' } }, ctx)
-      expect(postMessageSpy).toHaveBeenCalledWith({ type: 'save', data: 'test' }, '*')
+      expect(postMessageSpy).toHaveBeenCalledWith({ type: 'save', data: 'test' }, window.location.origin)
     })
 
     it('resolves formData.xxx references in message', () => {
@@ -217,7 +217,7 @@ describe('executeEventAction', () => {
       window.parent.postMessage = postMessageSpy
       ctx = createMockContext({ getFormData: vi.fn().mockReturnValue({ userName: 'Alice' }) })
       executeEventAction({ type: 'post-message', message: { name: 'formData.userName' } }, ctx)
-      expect(postMessageSpy).toHaveBeenCalledWith({ name: 'Alice' }, '*')
+      expect(postMessageSpy).toHaveBeenCalledWith({ name: 'Alice' }, window.location.origin)
     })
 
     it('does nothing if message is missing', () => {

@@ -12,7 +12,7 @@
 import { computed } from 'vue'
 import { validateExpression } from '@/utils/expression'
 import type { SchemaLinkage, LinkageType, DictItem, SchemaApiConfig } from '@/components/WidgetRenderer/types'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import styles from './LinkageConfig.module.scss'
 
 const props = defineProps<{

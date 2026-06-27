@@ -20,9 +20,10 @@ import type { FormData } from './types'
 import { widgetDataKey, widgetStyleKey, widgetRenderStateKey, formContextKey } from '../../widgets/base/types'
 import { EVENT_CONTEXT_KEY, FORM_GRID_LINKAGE_KEY, DIALOG_REGISTRY_KEY } from './types'
 import { getComponentMap } from '../../widgets/registry'
+import { getAllContainerTypes } from '../../composables/useConstant'
 import { triggerWidgetEvent } from '../../engine/eventEngine'
 import SchemaRender from './SchemaRender.vue'
-import AppDialog from '@schema-form/platform-shared/components/common/AppDialog.vue'
+import AppDialog from '@schema-platform/platform-shared/components/common/AppDialog.vue'
 
 const props = defineProps<{
   widget: PartialWidget
@@ -32,10 +33,10 @@ const props = defineProps<{
 
 const compMap = getComponentMap()
 
-const CONTAINER_TYPES: ReadonlySet<string> = new Set([
-  'form', 'card', 'tabs', 'dialog',
-  'single-col', 'double-col', 'triple-col', 'quad-col',
-])
+/** 动态获取容器类型集合（与 SchemaNode 保持一致） */
+function getContainerTypes(): Set<string> {
+  return getAllContainerTypes() as Set<string>
+}
 
 /** 表单类组件（支持 change 事件） */
 const FORM_COMPONENT_TYPES: ReadonlySet<string> = new Set([
@@ -54,7 +55,7 @@ const CLICKABLE_TYPES: ReadonlySet<string> = new Set([
   'button', 'toolbar-buttons', 'title', 'divider', 'spacer', 'banner',
 ])
 
-const isContainer = computed(() => CONTAINER_TYPES.has(props.widget.type))
+const isContainer = computed(() => getContainerTypes().has(props.widget.type))
 const resolvedComponent = computed(() => compMap[props.widget.type])
 
 // ---- Provide widget data to children ----
@@ -102,6 +103,10 @@ const renderState = computed(() => {
   // hidden 静态属性覆盖：hidden=true 时强制不可见
   if (props.widget.hidden) {
     return { ...base, visible: false }
+  }
+  // disabled 属性覆盖（规则引擎动态设置）
+  if (props.widget.disabled) {
+    return { ...base, disabled: true }
   }
   return base
 })

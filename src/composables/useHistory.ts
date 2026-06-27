@@ -32,7 +32,7 @@ function deepClone<T>(obj: T): T {
 }
 
 export function useHistory(options: UseHistoryOptions = {}): UseHistoryReturn {
-  const maxSize = options.maxSize ?? 50
+  const maxSize = options.maxSize ?? 30
 
   const history: PartialWidget[][] = []
   let pointer = -1

@@ -24,7 +24,7 @@ function getContainerTypes(): Set<string> {
 }
 
 /** 默认 position */
-const DEFAULT_POSITION = { x: 0, y: 0, w: 240, h: 40, zIndex: 1 }
+const DEFAULT_POSITION = { x: 0, y: 0, w: 240, h: 40, xUnit: 'px' as const, yUnit: 'px' as const, wUnit: 'px' as const, hUnit: 'px' as const, zIndex: 1 }
 
 /**
  * 递归补全 widget 的 position 字段。
@@ -39,6 +39,10 @@ function normalizePosition(widgets: Widget[]): Widget[] {
       w.position.y = w.position.y ?? 0
       w.position.w = w.position.w ?? 240
       w.position.h = w.position.h ?? 40
+      if (w.position.xUnit === undefined) w.position.xUnit = 'px'
+      if (w.position.yUnit === undefined) w.position.yUnit = 'px'
+      if (w.position.wUnit === undefined) w.position.wUnit = 'px'
+      if (w.position.hUnit === undefined) w.position.hUnit = 'px'
       if (w.position.zIndex === undefined) w.position.zIndex = 1
     }
     if (w.children?.length) {
@@ -86,8 +90,8 @@ function calculateColPosition(
   const gutterAdj = gutter * (colCount - 1) / colCount
 
   // 获取容器的实际像素尺寸（处理百分比）
-  const canvasWidth = 1920 // 默认画布宽度
-  const canvasHeight = 1080 // 默认画布高度
+  const canvasWidth = 1920 // 默认画布宽度，运行时由 boardStore 提供
+  const canvasHeight = 1080
   const containerWUnit = container.position?.wUnit ?? 'px'
   const containerHUnit = container.position?.hUnit ?? 'px'
   const containerW = containerWUnit === '%' ? (canvasWidth * container.position.w / 100) : container.position.w
@@ -102,9 +106,7 @@ function calculateColPosition(
   widget.position.y = 0
   widget.position.w = containerW * colPercent - gutterAdj
   widget.position.h = containerH
-  // 子组件使用 px 单位（由容器计算得出）
-  widget.position.wUnit = 'px'
-  widget.position.hUnit = 'px'
+  // 保留子组件原有的单位设置，不强制为 px
 }
 
 /** 列容器类型 → 列数映射 */
