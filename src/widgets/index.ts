@@ -57,6 +57,9 @@ import { FgSingleCol, createSingleColWidget, singleColConfig } from './single-co
 import { FgDoubleCol, createDoubleColWidget, doubleColConfig } from './double-col'
 import { FgTripleCol, createTripleColWidget, tripleColConfig } from './triple-col'
 import { FgQuadCol, createQuadColWidget, quadColConfig } from './quad-col'
+import { FgApprovalUserPicker, createApprovalUserPickerWidget, approvalUserPickerConfig } from './approval-user-picker'
+import { FgApprovalRolePicker, createApprovalRolePickerWidget, approvalRolePickerConfig } from './approval-role-picker'
+import { FgApprovalComment, createApprovalCommentWidget, approvalCommentConfig } from './approval-comment'
 
 export function registerAllWidgets() {
   // Layout widgets (结构布局)
@@ -358,6 +361,11 @@ export function registerAllWidgets() {
   registerWidget({ name: fileListConfig.name, displayName: fileListConfig.displayName, type: 'file-list', group: 'business', component: FgFileList, create: createFileListWidget, config: fileListConfig })
   registerWidget({ name: transferConfig.name, displayName: transferConfig.displayName, type: 'transfer', group: 'business', component: FgTransfer, create: createTransferWidget, config: transferConfig })
   registerWidget({ name: descriptionsConfig.name, displayName: descriptionsConfig.displayName, type: 'descriptions', group: 'business', component: FgDescriptions, create: createDescriptionsWidget, config: descriptionsConfig })
+
+  // Flow approval widgets (审批专用)
+  registerWidget({ name: approvalUserPickerConfig.name, displayName: approvalUserPickerConfig.displayName, type: 'approval-user-picker', group: 'business', component: FgApprovalUserPicker, create: createApprovalUserPickerWidget, config: approvalUserPickerConfig })
+  registerWidget({ name: approvalRolePickerConfig.name, displayName: approvalRolePickerConfig.displayName, type: 'approval-role-picker', group: 'business', component: FgApprovalRolePicker, create: createApprovalRolePickerWidget, config: approvalRolePickerConfig })
+  registerWidget({ name: approvalCommentConfig.name, displayName: approvalCommentConfig.displayName, type: 'approval-comment', group: 'business', component: FgApprovalComment, create: createApprovalCommentWidget, config: approvalCommentConfig })
 
   // Table widgets (表格)
   registerWidget({ name: tableConfig.name, displayName: tableConfig.displayName, type: 'table', group: 'table', component: FgTable, create: createTableWidget, config: tableConfig })

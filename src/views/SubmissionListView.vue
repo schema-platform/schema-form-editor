@@ -19,7 +19,7 @@ import {
 } from '@/utils/apiClient'
 import type { PaginatedResponse, SchemaListItem } from '@/types/api'
 import styles from './SubmissionListView.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 // ── 表单列表 ──
 const schemas = ref<SchemaListItem[]>([])

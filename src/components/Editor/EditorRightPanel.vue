@@ -6,7 +6,7 @@
  */
 import PropertyPanel from './PropertyPanel.vue'
 import type { PartialWidget } from '@/components/WidgetRenderer/types'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import styles from './EditorRightPanel.module.scss'
 
 defineProps<{
