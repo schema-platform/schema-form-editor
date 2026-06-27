@@ -22,7 +22,7 @@ import type {
   SchemaUpdatePayload,
 } from '@/types/api'
 import type { PartialWidget } from '@/components/WidgetRenderer/types'
-import { ApiError } from '@/utils/apiClient'
+import { createLoadingState } from '@/utils/storeHelpers'
 import {
   fetchSchemas as apiFetchSchemas,
   fetchSchemaById as apiFetchSchemaById,
@@ -48,11 +48,8 @@ export const useApiStore = defineStore('schema', () => {
   /** 当前查看/编辑的单个 Schema 详情 */
   const currentSchema = ref<SchemaListItem | null>(null)
 
-  /** 加载中标志 */
-  const loading = ref(false)
-
-  /** 最近一次错误信息 */
-  const error = ref('')
+  /** 统一 loading/error 状态管理 */
+  const { loading, error, withLoading, withErrorHandling } = createLoadingState()
 
   /** 搜索关键词 */
   const searchQuery = ref('')
@@ -77,66 +74,6 @@ export const useApiStore = defineStore('schema', () => {
 
   /** 是否有错误 */
   const hasError = computed(() => error.value !== '')
-
-  // ================================================================
-  // 内部工具
-  // ================================================================
-
-  /** 设置错误并重置 loading */
-  function setError(message: string): void {
-    error.value = message
-    loading.value = false
-  }
-
-  /** 清除错误 */
-  function clearError(): void {
-    error.value = ''
-  }
-
-  /**
-   * 安全包装异步操作：统一管理 loading/error 状态。
-   *
-   * @param fn - 要执行的异步函数
-   * @returns 函数的返回值，失败时返回 null
-   */
-  async function withLoading<T>(fn: () => Promise<T>): Promise<T | null> {
-    loading.value = true
-    clearError()
-    try {
-      return await fn()
-    } catch (e: unknown) {
-      if (e instanceof ApiError) {
-        setError(e.message)
-      } else if (e instanceof Error) {
-        setError(e.message)
-      } else {
-        setError('An unexpected error occurred')
-      }
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /**
-   * 安全包装异步操作：不设置全局 loading，仅捕获错误。
-   * 用于静默操作（如后台刷新）。
-   */
-  async function withErrorHandling<T>(fn: () => Promise<T>): Promise<T | null> {
-    clearError()
-    try {
-      return await fn()
-    } catch (e: unknown) {
-      if (e instanceof ApiError) {
-        setError(e.message)
-      } else if (e instanceof Error) {
-        setError(e.message)
-      } else {
-        setError('An unexpected error occurred')
-      }
-      return null
-    }
-  }
 
   // ================================================================
   // Schema 清单操作

@@ -7,7 +7,7 @@
  */
 import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
-import { ApiError } from '@/utils/apiClient'
+import { createLoadingState } from '@/utils/storeHelpers'
 import type { PaginatedResponse } from '@/types/api'
 import type {
   TenantItem,
@@ -27,8 +27,7 @@ const DEFAULT_PAGE_SIZE = 20
 export const useTenantStore = defineStore('tenant', () => {
   // ── 状态 ──
   const tenants = ref<TenantItem[]>([])
-  const loading = ref(false)
-  const error = ref('')
+  const { loading, error, withLoading } = createLoadingState()
   const searchQuery = ref('')
   const statusFilter = ref<TenantStatus | ''>('')
   const pagination = reactive({
@@ -42,31 +41,6 @@ export const useTenantStore = defineStore('tenant', () => {
   const hasTenants = computed(() => tenants.value.length > 0)
   const isEmpty = computed(() => !loading.value && tenants.value.length === 0)
   const hasError = computed(() => error.value !== '')
-
-  // ── 内部工具 ──
-  function setError(message: string) {
-    error.value = message
-    loading.value = false
-  }
-
-  function clearError() {
-    error.value = ''
-  }
-
-  async function withLoading<T>(fn: () => Promise<T>): Promise<T | null> {
-    loading.value = true
-    clearError()
-    try {
-      return await fn()
-    } catch (e: unknown) {
-      if (e instanceof ApiError) setError(e.message)
-      else if (e instanceof Error) setError(e.message)
-      else setError('An unexpected error occurred')
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
 
   // ── 列表操作 ──
   async function fetchTenants(params?: {
