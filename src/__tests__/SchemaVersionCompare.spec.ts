@@ -392,6 +392,6 @@ describe('SchemaVersionCompare', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('共 50 个版本')
-    expect(wrapper.find('.t-pagination').exists()).toBe(true)
+    expect(wrapper.find('.el-pagination').exists()).toBe(true)
   })
 })

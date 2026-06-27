@@ -10,7 +10,7 @@ import { useTenantStore } from '@/stores/tenant'
 import TenantFormDialog from '@/components/System/TenantFormDialog.vue'
 import type { TenantItem, TenantStatus } from '@/types/tenant'
 import styles from './TenantListView.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 const tenantStore = useTenantStore()
 

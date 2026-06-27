@@ -26,9 +26,12 @@ import type { Component } from 'vue'
 // ---- Stub Element Plus components used by PropertyField ----
 
 const elInputStub = {
-  template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+  template: `<div>
+    <input v-if="type !== 'textarea'" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
+    <textarea v-else :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" @focus="$emit('focus')" @blur="$emit('blur')" />
+  </div>`,
   props: ['modelValue', 'size', 'placeholder', 'disabled', 'type', 'rows', 'readonly'],
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'focus', 'blur'],
 }
 
 const elInputNumberStub = {
@@ -132,15 +135,15 @@ const tTextareaStub = {
 }
 
 const stubs = {
-  't-input': tInputStub,
-  't-input-number': tInputNumberStub,
-  't-switch': tSwitchStub,
-  't-select': tSelectStub,
-  't-option': tOptionStub,
-  't-color-picker': tColorPickerStub,
-  't-button': tButtonStub,
-  't-popup': tPopupStub,
-  't-textarea': tTextareaStub,
+  'el-input': elInputStub,
+  'el-input-number': elInputNumberStub,
+  'el-switch': elSwitchStub,
+  'el-select': elSelectStub,
+  'el-option': elOptionStub,
+  'el-color-picker': elColorPickerStub,
+  'el-button': elButtonStub,
+  'el-tooltip': elTooltipStub,
+  AppIcon: { template: '<span />', props: ['name', 'size'] },
   EventConfigDialog: { template: '<div />', props: ['visible', 'events'], emits: ['update:visible', 'save'] },
   LinkageConfigDialog: { template: '<div />', props: ['visible', 'rules'], emits: ['update:visible', 'save'] },
   OptionsApiConfigDialog: { template: '<div />', props: ['visible', 'api'], emits: ['update:visible', 'save'] },

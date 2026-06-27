@@ -204,7 +204,12 @@ function getStyleNum(style: Record<string, unknown> | undefined, key: string): n
   return parsePxVal(style?.[key] as string | undefined)
 }
 
-/** 计算 widget 的 margin 偏移和 border/padding 扩展尺寸 */
+/**
+ * 计算 widget 的 margin 偏移和扩展尺寸。
+ * hitArea 需要覆盖 widget 的 margin box（content + padding + border + margin）。
+ * - mx/my: 左上角偏移量（负值，向左上扩展到 margin 边缘）
+ * - bw/bh: 尺寸增量（左右/上下 margin 之和）
+ */
 function getStyleSizeDelta(widget: Widget): { mx: number; my: number; bw: number; bh: number } {
   const s = widget.style as Record<string, unknown> | undefined
   if (!s) return { mx: 0, my: 0, bw: 0, bh: 0 }
@@ -214,15 +219,12 @@ function getStyleSizeDelta(widget: Widget): { mx: number; my: number; bw: number
   const mb = getStyleNum(s, 'marginBottom') || getStyleNum(s, 'margin')
   const ml = getStyleNum(s, 'marginLeft') || getStyleNum(s, 'margin')
 
-  // margin 偏移（左上角位移）
-  const mx = ml - mr
-  const my = mt - mb
-
-  // margin 增量（总宽度 = 左margin + 右margin）
-  const marginW = ml + mr
-  const marginH = mt + mb
-
-  return { mx, my, bw: marginW, bh: marginH }
+  return {
+    mx: -ml,        // 向左扩展 left margin
+    my: -mt,        // 向上扩展 top margin
+    bw: ml + mr,    // 宽度增量 = 左右 margin
+    bh: mt + mb,    // 高度增量 = 上下 margin
+  }
 }
 // ================================================================
 
