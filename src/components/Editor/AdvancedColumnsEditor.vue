@@ -7,7 +7,7 @@
 import { ref } from 'vue'
 import type { AdvancedTableColumn, ActionButton } from '@/widgets/advanced-table/config'
 import type { SchemaApiConfig } from '@/components/WidgetRenderer/types'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import ActionListEditor from '@/components/Editor/ActionListEditor.vue'
 import type { ActionTypeOption } from '@/components/Editor/ActionListEditor.vue'
 import styles from './AdvancedColumnsEditor.module.scss'

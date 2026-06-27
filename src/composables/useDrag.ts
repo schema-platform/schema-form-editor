@@ -31,6 +31,18 @@ export function useDrag() {
   const editorStore = useEditorStore()
   const boardStore = useBoardStore()
 
+    /** 将 px 坐标转换为 %（如果 widget 使用百分比单位） */
+  function applyPercentPosition(widget: Widget) {
+    const canvasW = boardStore.getCanvasWidthPx()
+    const canvasH = boardStore.getCanvasHeightPx()
+    if (widget.position.xUnit === '%' && canvasW > 0) {
+      widget.position.x = Math.round((widget.position.x / canvasW) * 100 * 100) / 100
+    }
+    if (widget.position.yUnit === '%' && canvasH > 0) {
+      widget.position.y = Math.round((widget.position.y / canvasH) * 100 * 100) / 100
+    }
+  }
+
   /** 从面板开始拖拽新组件 */
   function startDragFromPanel(type: SchemaType) {
     const id = generateWidgetId(type)
@@ -486,6 +498,9 @@ export function useDrag() {
         newWidget.position.x = x
         newWidget.position.y = y
 
+        // 百分比单位转换
+        applyPercentPosition(newWidget)
+
         widgetStore.addWidget(newWidget)
         if (hoveredContainerId) {
           widgetStore.addToContainer(newWidget.id, hoveredContainerId)
@@ -514,6 +529,9 @@ export function useDrag() {
           finalCanvasY = constrained.y
           widgetStore.moveWidget(dragWidgetId, finalCanvasX, finalCanvasY)
           widgetStore.reparentToRoot(dragWidgetId)
+          // 百分比单位转换
+          const movedWidget = widgetStore.findWidget(dragWidgetId)
+          if (movedWidget) applyPercentPosition(movedWidget)
         } else {
           // 拖入容器：画布坐标 → 容器本地坐标
           // 对于嵌套容器，需要递归计算偏移

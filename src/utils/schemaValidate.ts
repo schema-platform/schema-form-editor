@@ -6,7 +6,6 @@
  */
 import { getComponentMap } from '@/widgets/registry'
 import type { PartialWidget, SchemaType } from '@/widgets/base/types'
-import { useBasicTypes, useBusinessTypes, useLayoutTypes } from '@/composables/useConstant'
 
 /**
  * Fallback set of known schema types when the widget registry is not yet populated
@@ -14,13 +13,28 @@ import { useBasicTypes, useBusinessTypes, useLayoutTypes } from '@/composables/u
  * Must be kept in sync with widgets/index.ts registrations.
  */
 const FALLBACK_SCHEMA_TYPES = new Set([
-  'form', 'card', 'tabs', 'dialog',
+  // 容器
+  'form', 'card', 'tabs', 'dialog', 'micro-app-container',
   'single-col', 'double-col', 'triple-col', 'quad-col',
+  // 基础组件
   'input', 'select', 'number', 'radio', 'checkbox', 'date', 'textarea', 'switch', 'slider',
-  'button-list', 'title', 'divider', 'spacer', 'toolbar-buttons', 'button',
+  'title', 'divider', 'spacer', 'toolbar-buttons', 'button',
   'table', 'richtext', 'upload', 'banner', 'tree-layout', 'date-time-slot', 'time-picker',
   'file-list', 'transfer', 'cascader', 'rate', 'color-picker',
-  'tag-input', 'autocomplete',
+  'tag-input', 'autocomplete', 'descriptions', 'advanced-table', 'statistic',
+  // 图表
+  'bar-chart', 'stacked-bar-chart', 'horizontal-bar-chart',
+  'line-chart', 'area-chart',
+  'pie-chart', 'donut-chart',
+  'scatter-chart', 'bubble-chart',
+  'radar', 'filled-radar',
+  'gauge', 'multi-gauge',
+  'heatmap',
+  'funnel', 'compare-funnel',
+  'candlestick',
+  // 业务组件
+  'approval-user-picker', 'approval-role-picker', 'approval-comment',
+  'iframe',
 ])
 
 /** Valid SchemaType values — lazily generated from widget registry */
@@ -37,18 +51,41 @@ function getValidSchemaTypes(): Set<string> {
 /** Types that are containers (support children) */
 const CONTAINER_TYPES = new Set<string>([
   'card', 'single-col', 'double-col', 'triple-col', 'quad-col',
-  'form', 'dialog', 'tabs',
+  'form', 'dialog', 'tabs', 'micro-app-container',
+])
+
+/** Static sets for component category classification (avoids ComputedRef issues in non-component context) */
+const BASIC_CATEGORY_TYPES = new Set<string>([
+  'input', 'select', 'number', 'radio', 'checkbox', 'date', 'textarea', 'switch', 'slider',
+  'title', 'divider', 'spacer', 'toolbar-buttons', 'button',
+  'table', 'richtext', 'banner', 'date-time-slot', 'time-picker',
+  'transfer', 'cascader', 'rate', 'color-picker', 'tag-input', 'autocomplete',
+  'descriptions', 'advanced-table', 'statistic', 'iframe',
+  'bar-chart', 'stacked-bar-chart', 'horizontal-bar-chart',
+  'line-chart', 'area-chart',
+  'pie-chart', 'donut-chart',
+  'scatter-chart', 'bubble-chart',
+  'radar', 'filled-radar',
+  'gauge', 'multi-gauge',
+  'heatmap',
+  'funnel', 'compare-funnel',
+  'candlestick',
+])
+
+const BUSINESS_CATEGORY_TYPES = new Set<string>([
+  'tree-layout', 'upload', 'file-list',
+  'approval-user-picker', 'approval-role-picker', 'approval-comment',
 ])
 
 /** Get the category of a component type: 'basic', 'business', or 'layout' */
 function getComponentCategory(type: string): 'basic' | 'business' | 'layout' {
-  if (useBasicTypes().has(type as SchemaType)) return 'basic'
-  if (useBusinessTypes().has(type as SchemaType)) return 'business'
+  if (BASIC_CATEGORY_TYPES.has(type)) return 'basic'
+  if (BUSINESS_CATEGORY_TYPES.has(type)) return 'business'
   return 'layout'
 }
 
 /** Types that don't require a `field` property even though they're not layout types */
-const NO_FIELD_TYPES = new Set<string>(['button', 'toolbar-buttons', 'title', 'banner', 'file-list'])
+const NO_FIELD_TYPES = new Set<string>(['button', 'toolbar-buttons', 'title', 'banner', 'file-list', 'iframe'])
 
 /** Types that typically have options (select/radio/checkbox) */
 const OPTION_TYPES = new Set<string>(['select', 'radio', 'checkbox'])
@@ -165,7 +202,7 @@ export function validateSchema(schema: PartialWidget[]): ValidationResult {
       }
 
       // 2. Missing field on non-layout components
-      if (!useLayoutTypes().has(item.type as SchemaType) && !NO_FIELD_TYPES.has(item.type) && !item.field) {
+      if (!CONTAINER_TYPES.has(item.type) && !NO_FIELD_TYPES.has(item.type) && !item.field) {
         errors.push({
           path: itemPath,
           type: 'missing-field',
