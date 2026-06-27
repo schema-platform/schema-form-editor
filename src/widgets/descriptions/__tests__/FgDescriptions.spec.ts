@@ -223,13 +223,13 @@ describe('FgDescriptions', () => {
       })
       mountDescriptions({
         props: {
-          dataSource: { type: 'api', url: '/api/user/1' },
+          dataSource: { type: 'api', url: '/user/1' },
           items: [{ label: '姓名', field: 'name', type: 'text' }],
         },
       })
-      // Wait for async onMounted
+      // Wait for async onMounted — apiClient prepends /api base path
       await vi.waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/user/1')
+        expect(mockFetch).toHaveBeenCalledWith('/api/user/1', expect.anything())
       })
     })
 

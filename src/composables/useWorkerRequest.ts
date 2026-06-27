@@ -1,7 +1,7 @@
 /** useWorkerRequest — fetch 请求封装 */
 import { ref, readonly, type Ref } from 'vue'
 import { useLogger } from './useLogger'
-import { genericFetchApi } from '@/api/requestApi'
+import { apiClient } from '@/utils/apiClient'
 
 export interface RequestConfig {
   url: string
@@ -33,25 +33,12 @@ export function useWorkerRequest(): WorkerRequestAPI {
     pendingCount.value++
     try {
       const { url, method = 'get', params, headers, dataPath } = config
-      let requestUrl = url
-      const mergedHeaders: Record<string, string> = { 'Content-Type': 'application/json', ...headers }
 
-      if (method === 'get' && params) {
-        const searchParams = new URLSearchParams()
-        for (const [key, value] of Object.entries(params)) {
-          if (value !== undefined && value !== null) {
-            searchParams.set(key, String(value))
-          }
-        }
-        const separator = url.includes('?') ? '&' : '?'
-        requestUrl = `${url}${separator}${searchParams.toString()}`
-      }
-
-      let data: unknown = await genericFetchApi(
-        requestUrl,
+      let data: unknown = await apiClient.requestUrl(
         method,
-        mergedHeaders,
-        method === 'get' ? undefined : params,
+        url,
+        params,
+        headers,
       )
       if (dataPath) {
         const extracted = extractByPath(data, dataPath)

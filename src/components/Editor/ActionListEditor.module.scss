@@ -1,7 +1,11 @@
+@use 'datasource-dialog-tokens' as *;
+
 .section {
   margin-top: 8px;
   border-top: 1px solid var(--border-color-light);
   padding-top: 8px;
+
+  @include datasource-unified-controls;
 }
 
 .sectionHeader {
@@ -66,10 +70,3 @@
   padding: 4px 0;
 }
 
-/* 统一表单控件高度 32px */
-.section :global(.el-input),
-.section :global(.el-select .el-input),
-.section :global(.el-button:not(.is-text)) {
-  height: 32px !important;
-  min-height: 32px !important;
-}

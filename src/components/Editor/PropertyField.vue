@@ -8,7 +8,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { fetchRemoteOptions as apiFetchRemoteOptions } from '@/api/widgetApi'
 import styles from './PropertyField.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 interface SelectOption {
   label: string

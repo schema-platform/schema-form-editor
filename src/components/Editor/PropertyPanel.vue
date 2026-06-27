@@ -36,7 +36,7 @@ import type { WidgetVariable } from '../../widgets/base/types'
 import { usePropertyAdapters } from '../../composables/usePropertyAdapters'
 import { useClipboard } from '../../composables/useClipboard'
 import styles from './style.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
@@ -162,8 +162,8 @@ const propertySections = computed<PropertySection[]>(() => {
     key: 'position',
     label: '位置',
     items: [
-      { key: 'position.x', label: 'X', type: 'number', value: widget.position?.x ?? 0, desc: '水平位置 (px)' },
-      { key: 'position.y', label: 'Y', type: 'number', value: widget.position?.y ?? 0, desc: '垂直位置 (px)' },
+      { key: 'position.x', label: 'X', type: 'number', value: widget.position?.x ?? 0, desc: '水平位置', unit: widget.position?.xUnit ?? 'px', unitKey: 'position.xUnit' },
+      { key: 'position.y', label: 'Y', type: 'number', value: widget.position?.y ?? 0, desc: '垂直位置', unit: widget.position?.yUnit ?? 'px', unitKey: 'position.yUnit' },
       { key: 'position.w', label: '宽度', type: 'number', value: widget.position?.w ?? 240, desc: '组件宽度', unit: widget.position?.wUnit ?? 'px', unitKey: 'position.wUnit' },
       { key: 'position.h', label: '高度', type: 'number', value: widget.position?.h ?? 40, desc: '组件高度', unit: widget.position?.hUnit ?? 'px', unitKey: 'position.hUnit' },
       { key: 'position.zIndex', label: '层级', type: 'number', value: widget.position?.zIndex ?? 0, desc: 'Z轴层级' },

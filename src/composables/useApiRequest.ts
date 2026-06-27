@@ -3,8 +3,9 @@
  *
  * 封装 fetch 请求，支持自定义 URL、方法、Headers。
  * 返回解析后的 JSON 数据。
+ * 统一经过 apiClient，自动注入 token 和错误处理。
  */
-import { genericFetchApi } from '@/api/requestApi'
+import { apiClient } from '@/utils/apiClient'
 
 export function useApiRequest() {
   async function fetchApi(
@@ -13,7 +14,7 @@ export function useApiRequest() {
     headers: Record<string, string> = {},
     params?: unknown,
   ): Promise<unknown> {
-    return genericFetchApi(url, method, headers, params)
+    return apiClient.requestUrl(method, url, params, headers)
   }
 
   return { fetchApi }

@@ -8,7 +8,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import { useBoardStore, MIN_ZOOM, MAX_ZOOM } from '@/stores/board'
 import { useEditorStore } from '@/stores/editor'
 import { useWidgetStore } from '@/stores/widget'
