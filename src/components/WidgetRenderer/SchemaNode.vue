@@ -26,7 +26,7 @@ import { useEditorStore } from '../../stores/editor'
 import { triggerWidgetEvent } from '../../engine/eventEngine'
 import { useLogger } from '../../composables/useLogger'
 import SchemaRender from './SchemaRender.vue'
-import AppDialog from '@schema-form/platform-shared/components/common/AppDialog.vue'
+import AppDialog from '@schema-platform/platform-shared/components/common/AppDialog.vue'
 import styles from './SchemaNode.module.scss'
 
 const props = defineProps<{
@@ -277,12 +277,14 @@ const CSS_STYLE_KEYS: ReadonlySet<string> = new Set([
 
 const wrapperStyle = computed(() => {
   const pos = props.widget.position ?? { x: 0, y: 0, w: 240, h: 40 }
+  const xUnit = pos.xUnit ?? 'px'
+  const yUnit = pos.yUnit ?? 'px'
   const wUnit = pos.wUnit ?? 'px'
   const hUnit = pos.hUnit ?? 'px'
   const style: Record<string, string | number> = {
     position: 'absolute',
-    left: `${pos.x}px`,
-    top: `${pos.y}px`,
+    left: `${pos.x}${xUnit}`,
+    top: `${pos.y}${yUnit}`,
     width: `${pos.w}${wUnit}`,
     height: `${pos.h}${hUnit}`,
   }

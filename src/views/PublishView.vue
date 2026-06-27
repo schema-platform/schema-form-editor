@@ -25,7 +25,7 @@ import { fetchPublishedSchema, fetchPublishedByPublishId } from '@/utils/apiClie
 import { sendToHost } from '@/microapp/bridge'
 import { registerAllWidgets } from '@/widgets'
 import styles from './PublishView.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 registerAllWidgets()
 

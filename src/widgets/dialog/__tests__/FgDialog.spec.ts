@@ -208,7 +208,7 @@ describe('FgDialog', () => {
       await nextTick()
       await nextTick()
       // ElementPlus dialog 渲染到 document.body，通过组件树查找按钮
-      const tButtons = wrapper.findAllComponents({ name: 'TButton' })
+      const tButtons = wrapper.findAllComponents({ name: 'ElButton' })
       const confirmBtn = tButtons.find(b => b.text().includes('确定'))
       expect(confirmBtn).toBeDefined()
       await confirmBtn!.trigger('click')
@@ -221,7 +221,7 @@ describe('FgDialog', () => {
       wrapper.vm.open()
       await nextTick()
       await nextTick()
-      const tButtons = wrapper.findAllComponents({ name: 'TButton' })
+      const tButtons = wrapper.findAllComponents({ name: 'ElButton' })
       const cancelBtn = tButtons.find(b => b.text().includes('取消'))
       expect(cancelBtn).toBeDefined()
       await cancelBtn!.trigger('click')
@@ -234,7 +234,7 @@ describe('FgDialog', () => {
       wrapper.vm.open({ status: 'active' })
       await nextTick()
       await nextTick()
-      const tButtons = wrapper.findAllComponents({ name: 'TButton' })
+      const tButtons = wrapper.findAllComponents({ name: 'ElButton' })
       const confirmBtn = tButtons.find(b => b.text().includes('确定'))
       expect(confirmBtn).toBeDefined()
       await confirmBtn!.trigger('click')
@@ -322,7 +322,7 @@ describe('FgDialog', () => {
           },
         },
       })
-      expect(wrapper.find('.t-dialog').exists()).toBe(false)
+      expect(wrapper.find('.el-dialog').exists()).toBe(false)
     })
   })
 })

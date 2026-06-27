@@ -11,8 +11,8 @@ import type { PartialWidget } from '@/components/WidgetRenderer/types'
 import type { SchemaListItem } from '@/types/api'
 import type { InteractionMode } from '@/composables/useConstant'
 import { useApiStore } from '@/stores/api'
-import { APP_CONFIGS } from '@schema-form/platform-shared/qiankun/config'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import { APP_CONFIGS } from '@schema-platform/platform-shared/qiankun/config'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import styles from './EditorToolbar.module.scss'
 
 const props = defineProps<{

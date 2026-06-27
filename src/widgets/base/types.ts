@@ -5,7 +5,7 @@ import type { InjectionKey, ComputedRef, Ref } from 'vue'
 // ============================================================
 
 /** 容器组件类型 */
-export type ContainerType = 'form' | 'card' | 'tabs' | 'dialog' | 'single-col' | 'double-col' | 'triple-col' | 'quad-col'
+export type ContainerType = 'form' | 'card' | 'tabs' | 'dialog' | 'single-col' | 'double-col' | 'triple-col' | 'quad-col' | 'micro-app-container'
 
 /** 基础组件类型 */
 export type BasicType =
@@ -34,7 +34,6 @@ export type BasicType =
   | 'date-time-slot'
   | 'time-picker'
   | 'cascader'
-  | 'rate'
   | 'color-picker'
   | 'tag-input'
   | 'autocomplete'
@@ -50,6 +49,9 @@ export type BasicType =
   | 'funnel' | 'compare-funnel'
   | 'candlestick'
   | 'statistic'
+  | 'approval-user-picker'
+  | 'approval-role-picker'
+  | 'approval-comment'
 
 /** 所有组件类型 */
 export type SchemaType = ContainerType | BasicType
@@ -377,7 +379,7 @@ export interface WidgetConfig {
   defaultStyle?: Record<string, unknown>
   defaultProps?: Record<string, unknown>
   /** 拖入画布时的默认位置（覆盖全局 DEFAULT_POSITION） */
-  defaultPosition?: Partial<{ x: number; y: number; w: number; h: number; wUnit: 'px' | '%'; hUnit: 'px' | '%'; zIndex: number }>
+  defaultPosition?: Partial<{ x: number; y: number; w: number; h: number; xUnit: 'px' | '%'; yUnit: 'px' | '%'; wUnit: 'px' | '%'; hUnit: 'px' | '%'; zIndex: number }>
   propertyPanel?: PropertyPanelConfig
   configPanels?: ConfigPanelType[]
   /** 事件目标列表 — 声明部件内可独立绑定事件的子元素（支持静态数组或动态函数） */
@@ -447,10 +449,12 @@ export interface Widget {
 
   // === 位置配置 ===
   position: {
-    x: number           // 水平位置 (px) - 绝对定位
-    y: number           // 垂直位置 (px) - 绝对定位
+    x: number           // 水平位置 - 绝对定位
+    y: number           // 垂直位置 - 绝对定位
     w: number           // 宽度值
     h: number           // 高度值
+    xUnit?: 'px' | '%'  // 水平位置单位，默认 px
+    yUnit?: 'px' | '%'  // 垂直位置单位，默认 px
     wUnit?: 'px' | '%'  // 宽度单位，默认 px
     hUnit?: 'px' | '%'  // 高度单位，默认 px
     zIndex?: number
@@ -582,14 +586,23 @@ export type PartialWidget = Omit<Widget, 'id' | 'name' | 'position' | 'children'
 /** 全宽组件类型集合 — 这些组件在 grid-col 中渲染时强制占满整行 */
 export const FULL_WIDTH_TYPES = [
   'table',
+  'advanced-table',
   'upload',
   'transfer',
   'banner',
   'tree-layout',
   'file-list',
   'descriptions',
-  'bar-chart', 'line-chart', 'pie-chart', 'scatter-chart',
-  'radar', 'gauge', 'heatmap', 'funnel', 'candlestick',
+  'statistic',
+  'bar-chart', 'stacked-bar-chart', 'horizontal-bar-chart',
+  'line-chart', 'area-chart',
+  'pie-chart', 'donut-chart',
+  'scatter-chart', 'bubble-chart',
+  'radar', 'filled-radar',
+  'gauge', 'multi-gauge',
+  'heatmap',
+  'funnel', 'compare-funnel',
+  'candlestick',
 ] as const
 
 /**

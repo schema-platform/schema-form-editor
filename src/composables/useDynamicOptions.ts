@@ -4,7 +4,7 @@
  *
  * apiConfig 支持静态值或响应式 getter，当联动切换 API 配置时自动重新加载
  */
-import { ref, inject, onMounted, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
+import { ref, inject, onMounted, onUnmounted, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
 import { FORM_GRID_CONTEXT_KEY, FORM_GRID_FORM_KEY } from '@/components/WidgetRenderer/types'
 import type { SchemaApiConfig, DictItem, FormData } from '@/components/WidgetRenderer/types'
 import { requestExternalUrl } from '@/api/requestApi'
@@ -26,6 +26,10 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
   const options = ref<DictItem[]>([]) as Ref<DictItem[]>
   const loading = ref(false)
   const error = ref('')
+  /** 递增的请求序号，用于丢弃过期响应（防竞态） */
+  let requestGeneration = 0
+  /** 组件是否已卸载 */
+  let isUnmounted = false
 
   const context = inject(FORM_GRID_CONTEXT_KEY, null)
   const formData = inject<FormData>(FORM_GRID_FORM_KEY, {} as FormData)
@@ -48,7 +52,7 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
 
   async function loadOptions() {
     const config = toValue(apiConfig)
-    if (!config) return
+    if (!config || isUnmounted) return
 
     // 1. 优先从字典查找
     if (config.dictCode && context?.global?.dictMap) {
@@ -71,7 +75,8 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
       return
     }
 
-    // 3. 发起请求（支持重试）
+    // 3. 发起请求（支持重试）— 递增 generation 用于丢弃过期响应
+    const gen = ++requestGeneration
     loading.value = true
     error.value = ''
     try {
@@ -80,6 +85,9 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
         () => requestExternalUrl(method, config.url, resolvedParams),
         { enableRetry: config.enableRetry, maxRetries: config.retryCount },
       )
+
+      // 过期响应丢弃
+      if (gen !== requestGeneration || isUnmounted) return
 
       // 归一化响应：支持 dataPath 配置或自动探测常见包装键
       const { data: rawList } = normalizeListResponse(res, { dataPath: config.dataPath })
@@ -110,10 +118,13 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
       // 写缓存
       setCachedOptions(config.url, resolvedParams, options.value, config.ttl ?? 0)
     } catch (e: unknown) {
+      if (gen !== requestGeneration || isUnmounted) return
       error.value = e instanceof Error ? e.message : '加载选项失败'
       logger.api(error.value)
     } finally {
-      loading.value = false
+      if (gen === requestGeneration && !isUnmounted) {
+        loading.value = false
+      }
     }
   }
 
@@ -141,6 +152,11 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
   if (config?.immediate !== false) {
     onMounted(loadOptions)
   }
+
+  onUnmounted(() => {
+    isUnmounted = true
+    requestGeneration++
+  })
 
   return {
     options,

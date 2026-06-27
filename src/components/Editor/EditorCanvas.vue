@@ -181,13 +181,11 @@ const previewEventContext: EventExecutionContext = {
     }
   },
   confirm: (message: string) => {
-    return new Promise<void>((resolve) => {
-      ElMessageBox.confirm(message, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).finally(() => resolve())
-    })
+    return ElMessageBox.confirm(message, '确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }).then(() => {})
   },
 }
 provide(EVENT_CONTEXT_KEY, previewEventContext)

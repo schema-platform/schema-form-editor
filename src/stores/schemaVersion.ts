@@ -16,7 +16,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { VersionEntry, SchemaDetail } from '@/types/api'
 import type { DiffResult } from '@/utils/schemaDiff'
-import { ApiError } from '@/utils/apiClient'
+import { createLoadingState } from '@/utils/storeHelpers'
 import {
   fetchVersions as apiFetchVersions,
   fetchVersion as apiFetchVersion,
@@ -39,11 +39,8 @@ export const useSchemaVersionStore = defineStore('schemaVersion', () => {
   /** editId — 版本查询主键 */
   const editId = ref('')
 
-  /** 加载中标志 */
-  const loading = ref(false)
-
-  /** 最近一次错误信息 */
-  const error = ref('')
+  /** 统一 loading/error 状态管理 */
+  const { loading, error, setError, clearError, withLoading } = createLoadingState()
 
   /** 分页 */
   const page = ref(1)
@@ -89,38 +86,6 @@ export const useSchemaVersionStore = defineStore('schemaVersion', () => {
     const { added, removed, modified, moved } = diffResult.value
     return added.length > 0 || removed.length > 0 || modified.length > 0 || moved.length > 0
   })
-
-  // ================================================================
-  // 内部工具
-  // ================================================================
-
-  function setError(message: string): void {
-    error.value = message
-    loading.value = false
-  }
-
-  function clearError(): void {
-    error.value = ''
-  }
-
-  async function withLoading<T>(fn: () => Promise<T>): Promise<T | null> {
-    loading.value = true
-    clearError()
-    try {
-      return await fn()
-    } catch (e: unknown) {
-      if (e instanceof ApiError) {
-        setError(e.message)
-      } else if (e instanceof Error) {
-        setError(e.message)
-      } else {
-        setError('An unexpected error occurred')
-      }
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
 
   // ================================================================
   // 版本列表操作
