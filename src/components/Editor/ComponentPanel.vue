@@ -13,7 +13,7 @@ import { Search } from '@element-plus/icons-vue'
 import { getWidgetsByGroup, type WidgetRegistryItem } from '@/widgets/registry'
 import type { SchemaType } from '@/widgets/base/types'
 import styles from './ComponentPanel.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 const GROUP_LABELS: Record<string, string> = {
   layout: '布局部件',

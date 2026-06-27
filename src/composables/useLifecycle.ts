@@ -13,7 +13,7 @@
  * 3. 初始化阶段通过 isInitialized flag 跳过 onFieldChange
  * 4. 所有钩子异常捕获并 console.error，不阻塞表单主流程
  */
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, onUnmounted, watch, ref } from 'vue'
 import type {
   FormLifecycleConfig,
   FormData,
@@ -99,9 +99,9 @@ export function useLifecycle(
   })
 
   // ---- onFieldChange: 深度监听 formData，300ms 防抖 ----
-  if (lifecycle?.onFieldChange) {
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
+  if (lifecycle?.onFieldChange) {
     watch(
       () => formData,
       (newData, oldData) => {
@@ -135,6 +135,14 @@ export function useLifecycle(
       { deep: true },
     )
   }
+
+  // ---- 组件卸载时清理防抖定时器 ----
+  onUnmounted(() => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+      debounceTimer = null
+    }
+  })
 
   // ---- onBeforeSubmit: 提交前校验 ----
   async function executeBeforeSubmit(): Promise<boolean> {

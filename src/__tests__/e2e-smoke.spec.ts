@@ -164,7 +164,7 @@ describe('E2E Smoke', () => {
     expect(wrapper.find(`.${ebStyles['fg-error-boundary__message']}`).text()).toContain('Simulated render crash')
 
     // Verify retry clears the error
-    await wrapper.find('.t-button').trigger('click')
+    await wrapper.find('.el-button').trigger('click')
     await nextTick()
     expect(wrapper.find(`.${ebStyles['fg-error-boundary']}`).exists()).toBe(false)
     expect(wrapper.find('.will-throw').exists()).toBe(true)

@@ -95,9 +95,9 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   function updateVariable(name: string, patch: Partial<BoardVariable>): void {
-    const variable = variables.value.find((v) => v.name === name)
-    if (variable) {
-      Object.assign(variable, patch)
+    const idx = variables.value.findIndex((v) => v.name === name)
+    if (idx >= 0) {
+      variables.value[idx] = { ...variables.value[idx], ...patch }
     }
   }
 
@@ -117,7 +117,7 @@ export const useBoardStore = defineStore('board', () => {
 
   function updateEvent(index: number, patch: Partial<BoardEvent>): void {
     if (index >= 0 && index < events.value.length) {
-      Object.assign(events.value[index], patch)
+      events.value[index] = { ...events.value[index], ...patch }
     }
   }
 

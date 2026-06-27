@@ -7,7 +7,7 @@
  * and full API configuration (url, method, params, dataPath, labelKey, valueKey).
  */
 import type { SearchFieldSchema, DictItem, SchemaApiConfig } from '@/components/WidgetRenderer/types'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import styles from './SearchFieldsEditor.module.scss'
 
 const props = defineProps<{

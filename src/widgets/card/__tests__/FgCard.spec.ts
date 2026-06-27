@@ -77,17 +77,17 @@ describe('FgCard', () => {
 
     it('shadow 属性可配置为 always', () => {
       const wrapper = mountCard({ props: { shadow: 'always' } })
-      expect(wrapper.find('.t-card').exists()).toBe(true)
+      expect(wrapper.find('.el-card').exists()).toBe(true)
     })
 
     it('showHeader=false 时不渲染标题栏', () => {
       const wrapper = mountCard({ props: { showHeader: false } })
-      expect(wrapper.find('.t-card__header').exists()).toBe(false)
+      expect(wrapper.find('.el-card__header').exists()).toBe(false)
     })
 
     it('showHeader=true 时渲染标题栏', () => {
       const wrapper = mountCard({ props: { showHeader: true, title: '标题' } })
-      expect(wrapper.find('.t-card__header').exists()).toBe(true)
+      expect(wrapper.find('.el-card__header').exists()).toBe(true)
     })
   })
 

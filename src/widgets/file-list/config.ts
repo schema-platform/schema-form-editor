@@ -9,6 +9,10 @@ export const fileListConfig: WidgetConfig = {
   exposedValues: [
     { key: 'value', type: 'array', description: '文件列表数据' },
   ],
+  eventTargets: [
+    { id: 'delete', label: '删除文件', description: '删除文件时触发' },
+    { id: 'preview', label: '预览文件', description: '预览文件时触发' },
+  ],
   configPanels: ['events', 'api', 'variables'],
   defaultProps: {
     title: '附件',

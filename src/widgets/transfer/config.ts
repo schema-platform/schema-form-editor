@@ -14,6 +14,9 @@ export const transferConfig: WidgetConfig = {
   exposedValues: [
     { key: 'value', type: 'array', description: '已选值' },
   ],
+  eventTargets: [
+    { id: 'change', label: '值变化', description: '已选值变化时触发' },
+  ],
   configPanels: ['events', 'rules', 'variables'] as const,
   propertyPanel: {
     basic: ['field', 'label'],

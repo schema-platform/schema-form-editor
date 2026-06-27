@@ -1,12 +1,12 @@
 /**
  * useCredentialStore -- Credential management state
  *
- * Responsibilities:
- * - Credential list fetch, pagination, search, type filter
- * - CRUD operations for credentials
+ * 使用 useDataLoading 统一 loading/error 状态管理。
+ * 仅在数据获取区域显示 loading（配合 v-loading 使用）。
  */
 import { defineStore } from 'pinia'
 import { ref, reactive, computed } from 'vue'
+import { useDataLoading } from '@schema-platform/platform-shared/utils/useDataLoading'
 import { ApiError } from '@/utils/apiClient'
 import type { PaginatedResponse } from '@/types/api'
 import type {
@@ -28,8 +28,7 @@ const DEFAULT_PAGE_SIZE = 20
 
 export const useCredentialStore = defineStore('credential', () => {
   const credentials = ref<CredentialItem[]>([])
-  const loading = ref(false)
-  const error = ref('')
+  const { loading, error, withLoading } = useDataLoading({ timeout: 15000 })
   const searchQuery = ref('')
   const typeFilter = ref<CredentialType | ''>('')
   const pagination = reactive({
@@ -41,30 +40,10 @@ export const useCredentialStore = defineStore('credential', () => {
 
   const hasCredentials = computed(() => credentials.value.length > 0)
   const isEmpty = computed(() => !loading.value && credentials.value.length === 0)
-  const hasError = computed(() => error.value !== '')
-
-  function setError(message: string) {
-    error.value = message
-    loading.value = false
-  }
+  const hasError = computed(() => error.value !== null)
 
   function clearError() {
-    error.value = ''
-  }
-
-  async function withLoading<T>(fn: () => Promise<T>): Promise<T | null> {
-    loading.value = true
-    clearError()
-    try {
-      return await fn()
-    } catch (e: unknown) {
-      if (e instanceof ApiError) setError(e.message)
-      else if (e instanceof Error) setError(e.message)
-      else setError('An unexpected error occurred')
-      return null
-    } finally {
-      loading.value = false
-    }
+    error.value = null
   }
 
   async function fetchCredentials(params?: {
@@ -77,13 +56,6 @@ export const useCredentialStore = defineStore('credential', () => {
     const pageSize = params?.pageSize ?? pagination.pageSize
     const search = params?.search ?? searchQuery.value
     const type = params?.type ?? typeFilter.value
-
-    const queryParams: Record<string, string> = {
-      page: String(page),
-      pageSize: String(pageSize),
-    }
-    if (search) queryParams.search = search
-    if (type) queryParams.type = type
 
     const result = await withLoading(() =>
       apiFetchCredentials({ page, pageSize, search: search || undefined, type: type || undefined }),
@@ -133,9 +105,8 @@ export const useCredentialStore = defineStore('credential', () => {
       }
       return true
     } catch (e: unknown) {
-      if (e instanceof ApiError) setError(e.message)
-      else if (e instanceof Error) setError(e.message)
-      else setError('An unexpected error occurred')
+      const msg = e instanceof ApiError ? e.message : e instanceof Error ? e.message : '操作失败'
+      error.value = msg
       return false
     }
   }
