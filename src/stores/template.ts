@@ -1,16 +1,12 @@
 /**
  * useTemplateStore — 组件模板库状态管理
  *
- * 职责：
- * - 模板列表的获取、搜索、筛选、分页
- * - 模板的应用（获取 widgets 并返回）
- * - 模板的创建（从画布保存）
- * - 模板的删除
- *
- * 所有 API 调用通过 apiClient 中的 fetchTemplates / applyTemplate / createTemplate / deleteTemplate。
+ * 使用 useDataLoading 统一 loading/error 状态管理。
+ * 仅在数据获取区域显示 loading（配合 v-loading 使用）。
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useDataLoading } from '@schema-platform/platform-shared/utils/useDataLoading'
 import {
   fetchTemplates,
   applyTemplate,
@@ -26,8 +22,7 @@ export const useTemplateStore = defineStore('template', () => {
 
   const templates = ref<TemplateItem[]>([])
   const total = ref(0)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  const { loading, error, withLoading } = useDataLoading({ timeout: 15000 })
 
   // ================================================================
   // 筛选 / 分页
@@ -46,9 +41,7 @@ export const useTemplateStore = defineStore('template', () => {
   // ================================================================
 
   async function loadTemplates(): Promise<void> {
-    loading.value = true
-    error.value = null
-    try {
+    await withLoading(async () => {
       const res = await fetchTemplates({
         search: searchKeyword.value || undefined,
         category: selectedCategory.value || undefined,
@@ -57,13 +50,7 @@ export const useTemplateStore = defineStore('template', () => {
       })
       templates.value = res.items
       total.value = res.total
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '加载模板失败'
-      templates.value = []
-      total.value = 0
-    } finally {
-      loading.value = false
-    }
+    })
   }
 
   // ================================================================

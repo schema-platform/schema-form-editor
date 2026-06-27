@@ -92,7 +92,7 @@ describe('FgForm', () => {
   describe('Props', () => {
     it('默认 labelWidth 为 100px', () => {
       const wrapper = mountForm()
-      const elForm = wrapper.find('.t-form')
+      const elForm = wrapper.find('.el-form')
       // Element Plus 渲染 label-width 为属性或 CSS 变量
       expect(elForm.exists()).toBe(true)
       const widget = store.findWidget('test_form')!
@@ -101,7 +101,7 @@ describe('FgForm', () => {
 
     it('labelWidth 可自定义', () => {
       const wrapper = mountForm({ props: { labelWidth: '120px' } })
-      const elForm = wrapper.find('.t-form')
+      const elForm = wrapper.find('.el-form')
       expect(elForm.exists()).toBe(true)
       const widget = store.findWidget('test_form')!
       expect(widget.props?.labelWidth).toBe('120px')
@@ -109,7 +109,7 @@ describe('FgForm', () => {
 
     it('默认 labelPosition 为 right', () => {
       const wrapper = mountForm()
-      const elForm = wrapper.find('.t-form')
+      const elForm = wrapper.find('.el-form')
       expect(elForm.exists()).toBe(true)
       const widget = store.findWidget('test_form')!
       expect(widget.props?.labelPosition).toBe('right')
@@ -117,7 +117,7 @@ describe('FgForm', () => {
 
     it('labelPosition 可配置为 left', () => {
       const wrapper = mountForm({ props: { labelPosition: 'left' } })
-      const elForm = wrapper.find('.t-form')
+      const elForm = wrapper.find('.el-form')
       expect(elForm.exists()).toBe(true)
       const widget = store.findWidget('test_form')!
       expect(widget.props?.labelPosition).toBe('left')

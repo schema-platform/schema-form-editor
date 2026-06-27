@@ -59,6 +59,10 @@ const BLOCKED_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
   { pattern: /\bwhile\s*\(/, message: '禁止循环语句: while' },
   { pattern: /\bfor\s*\(/, message: '禁止循环语句: for' },
   { pattern: /\bdo\s*\{/, message: '禁止循环语句: do' },
+  // Prototype chain escape (prevent sandbox bypass)
+  { pattern: /\bconstructor\b/, message: '禁止访问原型链: constructor' },
+  { pattern: /\b__proto__\b/, message: '禁止访问原型链: __proto__' },
+  { pattern: /\bprototype\b/, message: '禁止访问原型链: prototype' },
 ]
 
 // ---- LRU Compile Cache ----

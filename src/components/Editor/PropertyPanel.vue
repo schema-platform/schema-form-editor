@@ -10,6 +10,7 @@
 import { computed, ref, watch } from 'vue'
 import { useEditorStore } from '../../stores/editor'
 import { useWidgetStore } from '../../stores/widget'
+import { checkSecurity } from '../../utils/expression'
 import { useBoardStore } from '../../stores/board'
 import { getWidget } from '../../widgets/registry'
 import { publicStylePanel } from '../../widgets/base/publicSchema'
@@ -36,7 +37,7 @@ import type { WidgetVariable } from '../../widgets/base/types'
 import { usePropertyAdapters } from '../../composables/usePropertyAdapters'
 import { useClipboard } from '../../composables/useClipboard'
 import styles from './style.module.scss'
-import AppIcon from '@schema-form/platform-shared/components/common/AppIcon.vue'
+import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
@@ -114,8 +115,12 @@ function getBasicPropertyItem(prop: string, widget: Widget): PropertyItem {
     label: { label: '标签', type: 'text', value: widget.label, desc: '组件显示标签' },
     defaultValue: { label: '默认值', type: 'text', value: widget.defaultValue, desc: '组件默认值' },
     hidden: { label: '隐藏', type: 'switch', value: widget.hidden, desc: '设计时隐藏组件' },
+    disabled: { label: '禁用', type: 'switch', value: widget.disabled, desc: '禁用组件' },
     options: { label: '选项', type: 'options', value: widget.options, desc: '下拉/单选/多选的选项列表' },
     validationRules: { label: '校验规则', type: 'rules', value: widget.validationRules, desc: '表单校验规则' },
+    visibleOn: { label: '条件可见', type: 'text', value: widget.visibleOn, desc: '表达式为真时可见（如: status === "show"）' },
+    disabledOn: { label: '条件禁用', type: 'text', value: widget.disabledOn, desc: '表达式为真时禁用' },
+    requiredOn: { label: '条件必填', type: 'text', value: widget.requiredOn, desc: '表达式为真时必填' },
   }
   const mapped = map[prop]
   if (mapped) {
@@ -162,8 +167,8 @@ const propertySections = computed<PropertySection[]>(() => {
     key: 'position',
     label: '位置',
     items: [
-      { key: 'position.x', label: 'X', type: 'number', value: widget.position?.x ?? 0, desc: '水平位置 (px)' },
-      { key: 'position.y', label: 'Y', type: 'number', value: widget.position?.y ?? 0, desc: '垂直位置 (px)' },
+      { key: 'position.x', label: 'X', type: 'number', value: widget.position?.x ?? 0, desc: '水平位置', unit: widget.position?.xUnit ?? 'px', unitKey: 'position.xUnit' },
+      { key: 'position.y', label: 'Y', type: 'number', value: widget.position?.y ?? 0, desc: '垂直位置', unit: widget.position?.yUnit ?? 'px', unitKey: 'position.yUnit' },
       { key: 'position.w', label: '宽度', type: 'number', value: widget.position?.w ?? 240, desc: '组件宽度', unit: widget.position?.wUnit ?? 'px', unitKey: 'position.wUnit' },
       { key: 'position.h', label: '高度', type: 'number', value: widget.position?.h ?? 40, desc: '组件高度', unit: widget.position?.hUnit ?? 'px', unitKey: 'position.hUnit' },
       { key: 'position.zIndex', label: '层级', type: 'number', value: widget.position?.zIndex ?? 0, desc: 'Z轴层级' },
@@ -234,8 +239,13 @@ function compileVisibleOn(expr: string): (props: Record<string, unknown>) => boo
   const cached = visibleOnCache.get(expr)
   if (cached) return cached
 
-  // 将 "props.xxx === 'yyy'" 转换为 Function
-  // 安全：visibleOn 来自 config.ts，非用户输入
+  // 安全检查：复用表达式引擎的 blocklist
+  const securityError = checkSecurity(expr)
+  if (securityError) {
+    console.warn(`[PropertyPanel] visibleOn 安全检查失败: ${securityError}`)
+    return () => false
+  }
+
   const fn = new Function('props', `"use strict"; return (${expr})`) as (props: Record<string, unknown>) => boolean
   visibleOnCache.set(expr, fn)
   return fn
@@ -275,7 +285,7 @@ function toggleSection(key: string) {
 
 // ---- 更新属性 ----
 
-const TOP_LEVEL_KEYS = new Set(['field', 'label', 'defaultValue', 'hidden', 'options', 'validationRules'])
+const TOP_LEVEL_KEYS = new Set(['field', 'label', 'defaultValue', 'hidden', 'disabled', 'options', 'validationRules', 'visibleOn', 'disabledOn', 'requiredOn'])
 
 function setNestedValue(obj: Record<string, unknown>, path: string[], value: unknown): Record<string, unknown> {
   if (path.length === 1) {

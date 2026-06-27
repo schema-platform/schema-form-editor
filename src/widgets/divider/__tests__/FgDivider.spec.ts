@@ -100,8 +100,10 @@ describe('FgDivider', () => {
   describe('content 属性', () => {
     it('无 content 时分割线无文字', () => {
       const wrapper = mountWidget()
-      // ElementPlus 无 content 时不渲染 inner-text 元素
-      expect(wrapper.find('.t-divider__inner-text').exists()).toBe(false)
+      // Element Plus always renders .el-divider__text; check it has no visible text
+      const textEl = wrapper.find('.el-divider__text')
+      expect(textEl.exists()).toBe(true)
+      expect(textEl.text().trim()).toBe('')
     })
 
     it('有 content 时显示文字', () => {
@@ -117,7 +119,7 @@ describe('FgDivider', () => {
           },
         },
       })
-      expect(wrapper.find('.t-divider__inner-text').text()).toBe('分隔标题')
+      expect(wrapper.find('.el-divider__text').text()).toBe('分隔标题')
     })
   })
 

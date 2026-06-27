@@ -1092,7 +1092,7 @@ describe('三大配置系统 + 变量系统 交互集成', () => {
         message: { type: 'save', formId: 'formData.id' },
       }, ctx)
 
-      expect(postMessage).toHaveBeenCalledWith({ type: 'save', formId: 123 }, '*')
+      expect(postMessage).toHaveBeenCalledWith({ type: 'save', formId: 123 }, window.location.origin)
     })
   })
 })
