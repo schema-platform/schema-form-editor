@@ -12,9 +12,14 @@
 }
 .search {
   margin: 8px 12px;
+  overflow: hidden;
 }
 .body {
   flex: 1;
   padding: 12px;
   color: var(--text-color-muted);
+}
+.placeholder {
+  color: var(--text-color-muted);
+  font-size: 14px;
 }

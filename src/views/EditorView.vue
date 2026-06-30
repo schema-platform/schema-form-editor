@@ -39,6 +39,7 @@ import SaveTemplateDialog from '@/components/Editor/SaveTemplateDialog.vue'
 import EditorViewToolbar from './EditorViewToolbar.vue'
 import EditorViewLeftPanel from './EditorViewLeftPanel.vue'
 import EditorViewRightPanel from './EditorViewRightPanel.vue'
+import EditorRuler from '@/components/Editor/EditorRuler.vue'
 import styles from './EditorView.module.scss'
 
 // Register all widgets on first mount
@@ -54,6 +55,7 @@ const schemaVersionStore = useSchemaVersionStore()
 const { captureElement } = useSnapshot()
 const editorCanvasRef = ref<InstanceType<typeof EditorCanvas>>()
 const aiIframeRef = ref<HTMLIFrameElement>()
+const canvasScrollRef = ref<HTMLElement>()
 
 // 自动保存：脏数据 60 秒后自动触发保存（偏好持久化到 localStorage）
 const autoSaveEnabled = ref(localStorage.getItem('editor_auto_save') !== 'off')
@@ -536,7 +538,8 @@ function handleVersionLoadedFromToolbar(version: string) {
 
       <!-- Center: canvas + debug panels -->
       <div :class="styles.center">
-        <div :class="styles.canvasScroll">
+        <EditorRuler v-if="mode === 'edit'" :scroll-container="canvasScrollRef" />
+        <div ref="canvasScrollRef" :class="styles.canvasScroll">
           <EditorCanvas
             ref="editorCanvasRef"
             @open-event="handleOpenEvent"

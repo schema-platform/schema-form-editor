@@ -5,7 +5,7 @@ import { computed } from 'vue'
 import ElementPlus from 'element-plus'
 import { useWidgetStore } from '@/stores/widget'
 import { registerAllWidgets } from '@/widgets/index'
-import { createWidget } from '@/widgets/registry'
+import { createWidget, getWidget } from '@/widgets/registry'
 import { widgetDataKey, widgetStyleKey } from '../../base/types'
 import FgTreeLayout from '../FgTreeLayout.vue'
 import { treeLayoutConfig } from '../config'
@@ -134,6 +134,17 @@ describe('FgTreeLayout', () => {
     it('configPanels 包含 events 和 api', () => {
       expect(treeLayoutConfig.configPanels).toContain('events')
       expect(treeLayoutConfig.configPanels).toContain('api')
+    })
+  })
+
+  // Container group
+  describe('容器分组', () => {
+    it('group 为 container', () => {
+      const widget = createWidget('tree-layout', 'test_tree')
+      expect(widget).toBeDefined()
+      // 通过 registry 验证 group
+      const registryItem = getWidget('tree-layout')
+      expect(registryItem?.group).toBe('container')
     })
   })
 })

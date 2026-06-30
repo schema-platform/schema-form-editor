@@ -352,6 +352,19 @@ function handleWidgetMouseDown(e: MouseEvent, widget: Widget) {
   const startY = e.clientY
   let dragging = false
   const DRAG_THRESHOLD = 3
+  let rafId: number | null = null
+  let pendingEvent: MouseEvent | null = null
+
+  const processMouseMove = () => {
+    if (!pendingEvent || !dragging || !overlayRef.value) {
+      rafId = null
+      return
+    }
+    const me = pendingEvent
+    pendingEvent = null
+    updateDrag(me.clientX, me.clientY, overlayRef.value)
+    rafId = null
+  }
 
   const onMouseMove = (me: MouseEvent) => {
     const dx = me.clientX - startX
@@ -364,14 +377,21 @@ function handleWidgetMouseDown(e: MouseEvent, widget: Widget) {
       }
     }
 
-    if (dragging && overlayRef.value) {
-      updateDrag(me.clientX, me.clientY, overlayRef.value)
+    if (dragging) {
+      pendingEvent = me
+      if (rafId === null) {
+        rafId = requestAnimationFrame(processMouseMove)
+      }
     }
   }
 
   const onMouseUp = () => {
     if (dragging) {
       endDrag()
+    }
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
     }
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
@@ -402,6 +422,20 @@ function handleHandleMouseDown(e: MouseEvent, handle: ResizeHandle) {
 }
 
 /** 拖拽悬停（从面板拖入时更新位置） */
+let dragOverRafId: number | null = null
+let pendingDragOverEvent: DragEvent | null = null
+
+function processDragOver() {
+  if (!pendingDragOverEvent || !dragStore.isDragging || !overlayRef.value) {
+    dragOverRafId = null
+    return
+  }
+  const e = pendingDragOverEvent
+  pendingDragOverEvent = null
+  updateDrag(e.clientX, e.clientY, overlayRef.value)
+  dragOverRafId = null
+}
+
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
   // 面板拖入：首次 dragover 时启动拖拽跟踪，使碰撞检测和预览线在悬停阶段生效
@@ -412,8 +446,11 @@ function handleDragOver(e: DragEvent) {
       dragStore.startDrag('panel', `preview_${Date.now()}`, 'input')
     }
   }
-  if (dragStore.isDragging && overlayRef.value) {
-    updateDrag(e.clientX, e.clientY, overlayRef.value)
+  if (dragStore.isDragging) {
+    pendingDragOverEvent = e
+    if (dragOverRafId === null) {
+      dragOverRafId = requestAnimationFrame(processDragOver)
+    }
   }
 }
 

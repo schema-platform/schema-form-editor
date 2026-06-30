@@ -113,8 +113,21 @@ const routes = [
   },
 ]
 
+/**
+ * 从浏览器 URL 自动推导子应用的路由 base。
+ * qiankun 模式下 shell 通过 getRouteBase() 下发；独立运行时从 URL 推导。
+ */
+function inferRouteBase(): string {
+  const p = window.location.pathname
+  const match = p.match(/^(.+?\/)(app|standalone)\/([^/]+)(\/|$)/)
+  if (match) {
+    return `${match[1]}${match[2]}/${match[3]}`
+  }
+  return ''
+}
+
 export function createEditorRouter(routeBase?: string) {
-  const base = routeBase || import.meta.env.VITE_ROUTE_BASE || '/'
+  const base = routeBase || inferRouteBase() || import.meta.env.VITE_ROUTE_BASE || '/'
   const router = createRouter({
     history: createWebHistory(base),
     routes,

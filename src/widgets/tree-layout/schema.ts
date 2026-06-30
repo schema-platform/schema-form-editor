@@ -10,5 +10,6 @@ export function createTreeLayoutWidget(id: string): Widget {
     position: { x: 0, y: 0, w: 100, h: 200, wUnit: '%', zIndex: 1 },
     style: { ...treeLayoutConfig.defaultStyle },
     props: { ...treeLayoutConfig.defaultProps },
+    children: [],
   }
 }

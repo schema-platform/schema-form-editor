@@ -365,7 +365,7 @@ export function registerAllWidgets() {
   })
 
   // Business widgets (业务组件)
-  registerWidget({ name: treeLayoutConfig.name, displayName: treeLayoutConfig.displayName, type: 'tree-layout', group: 'business', component: FgTreeLayout, create: createTreeLayoutWidget, config: treeLayoutConfig })
+  registerWidget({ name: treeLayoutConfig.name, displayName: treeLayoutConfig.displayName, type: 'tree-layout', group: 'container', component: FgTreeLayout, create: createTreeLayoutWidget, config: treeLayoutConfig })
   registerWidget({ name: fileListConfig.name, displayName: fileListConfig.displayName, type: 'file-list', group: 'business', component: FgFileList, create: createFileListWidget, config: fileListConfig })
   registerWidget({ name: transferConfig.name, displayName: transferConfig.displayName, type: 'transfer', group: 'business', component: FgTransfer, create: createTransferWidget, config: transferConfig })
   registerWidget({ name: descriptionsConfig.name, displayName: descriptionsConfig.displayName, type: 'descriptions', group: 'business', component: FgDescriptions, create: createDescriptionsWidget, config: descriptionsConfig })

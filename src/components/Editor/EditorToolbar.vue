@@ -6,14 +6,16 @@
  * 保留新版设计风格，恢复旧版关键功能
  */
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { PartialWidget } from '@/components/WidgetRenderer/types'
 import type { SchemaListItem } from '@/types/api'
 import type { InteractionMode } from '@/composables/useConstant'
 import { useApiStore } from '@/stores/api'
-import { APP_CONFIGS } from '@schema-platform/platform-shared/qiankun/config'
 import AppIcon from '@schema-platform/platform-shared/components/common/AppIcon.vue'
 import styles from './EditorToolbar.module.scss'
+
+const router = useRouter()
 
 const props = defineProps<{
   mode: InteractionMode
@@ -186,8 +188,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function goToPortal() {
-  // Navigate to shell home — management pages belong to admin/shell, not editor
-  window.location.href = APP_CONFIGS.shell.basePath
+  router.push({ name: 'instances' })
 }
 
 onMounted(() => { document.addEventListener('keydown', handleKeydown) })
