@@ -69,6 +69,8 @@ const isAbsoluteLayout = computed(() => props.layout === 'absolute')
 const absoluteContainerStyle = computed(() => {
   if (!isAbsoluteLayout.value) return undefined
   const cc = props.canvasConfig
+  const wUnit = cc?.widthUnit ?? 'px'
+  const hUnit = cc?.heightUnit ?? 'px'
   const canvasWidth = cc?.width ?? 1920
   const canvasHeight = cc?.height ?? 1080
   let maxRight = 0
@@ -77,10 +79,10 @@ const absoluteContainerStyle = computed(() => {
     for (const item of items) {
       const pos = item.position
       if (pos) {
-        const wUnit = pos.wUnit ?? 'px'
-        const hUnit = pos.hUnit ?? 'px'
-        const w = wUnit === '%' ? (canvasWidth * pos.w / 100) : (pos.w ?? 0)
-        const h = hUnit === '%' ? (canvasHeight * pos.h / 100) : (pos.h ?? 0)
+        const pwUnit = pos.wUnit ?? 'px'
+        const phUnit = pos.hUnit ?? 'px'
+        const w = pwUnit === '%' ? (canvasWidth * pos.w / 100) : (pos.w ?? 0)
+        const h = phUnit === '%' ? (canvasHeight * pos.h / 100) : (pos.h ?? 0)
         maxRight = Math.max(maxRight, (pos.x ?? 0) + w)
         maxBottom = Math.max(maxBottom, (pos.y ?? 0) + h)
       }
@@ -91,8 +93,12 @@ const absoluteContainerStyle = computed(() => {
 
   const style: Record<string, string | number> = {
     position: 'relative',
-    width: `${canvasWidth}px`,
-    minHeight: `${Math.max(maxBottom, canvasHeight)}px`,
+    width: wUnit === '%' ? `${canvasWidth}%` : `${canvasWidth}px`,
+  }
+  if (hUnit === '%') {
+    style.height = `${canvasHeight}%`
+  } else {
+    style.minHeight = `${Math.max(maxBottom, canvasHeight)}px`
   }
   if (cc?.backgroundColor) style.backgroundColor = cc.backgroundColor
   if (cc?.padding) style.padding = cc.padding

@@ -10,14 +10,15 @@ export const doubleColConfig: WidgetConfig = {
   configPanels: ['events', 'variables'],
   defaultProps: {
     gutter: 16,
-    colWidths: [50, 50],
+    colWidths: [0, 0],
+    colWidthUnit: 'px',
   },
   propertyPanel: {
     basic: [
       { key: 'gutter', label: '列间距', type: 'number', default: 16 },
       {
         key: 'colWidths',
-        label: '列宽(%)',
+        label: '列宽(px，0=自适应)',
         type: 'number-array',
       },
     ],

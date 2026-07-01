@@ -6,10 +6,73 @@
   height: 100%;
 }
 
-/* 强制所有直接子元素（widget 根元素）填满容器 */
-.nodeWrapper > * {
-  width: 100% !important;
-  height: 100% !important;
+/* 容器组件：强制填满 wrapper 宽高 */
+.nodeWrapperContainer {
+  overflow: hidden;
+
+  > * {
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+  }
+
+  :global(.el-card) {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  :global(.el-card__body) {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+}
+
+/* 基础组件：宽高与 position 配置一致 */
+.nodeWrapperBase {
+  overflow: hidden;
+
+  > * {
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* 覆盖全局/EP 默认高度，使 --el-component-size 生效 */
+  :global(.el-input),
+  :global(.el-select),
+  :global(.el-input-number),
+  :global(.el-date-editor),
+  :global(.el-cascader),
+  :global(.el-autocomplete),
+  :global(.el-tree-select) {
+    display: inline-flex !important;
+    vertical-align: top;
+    min-height: 0 !important;
+  }
+
+  :global(.el-input .el-input__wrapper),
+  :global(.el-select .el-select__wrapper),
+  :global(.el-input-number .el-input__wrapper) {
+    height: 100% !important;
+    min-height: unset !important;
+    box-sizing: border-box;
+  }
+
+  :global(.el-input .el-input__inner) {
+    height: var(--el-input-inner-height) !important;
+  }
+
+  :global(.el-textarea) {
+    height: 100% !important;
+  }
+
+  :global(.el-textarea__inner) {
+    height: 100% !important;
+    min-height: unset !important;
+    resize: none;
+  }
 }
 
 /* 容器内部子部件的渲染容器 */

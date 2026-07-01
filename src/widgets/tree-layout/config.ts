@@ -10,13 +10,15 @@ export const treeLayoutConfig: WidgetConfig = {
   configPanels: ['events', 'api', 'variables'],
   defaultProps: {
     title: '树形布局',
+    showHeader: true,
     showSearch: true,
   },
   propertyPanel: {
     basic: ['label'],
-    style: [],
+    style: ['margin', 'padding', 'backgroundColor', 'border', 'borderRadius'],
     props: [
       { key: 'title', label: '标题', type: 'input', default: '树形布局' },
+      { key: 'showHeader', label: '显示标题栏', type: 'switch', default: true },
       { key: 'showSearch', label: '显示搜索', type: 'switch', default: true },
     ],
   },

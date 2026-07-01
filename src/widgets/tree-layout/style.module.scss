@@ -20,6 +20,16 @@
   color: var(--text-color-muted);
 }
 .placeholder {
-  color: var(--text-color-muted);
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 60px;
+  color: var(--text-color-placeholder);
+  font-size: 12px;
+  border: 1px dashed var(--border-color-base);
+  border-radius: 4px;
+  background: var(--bg-color-gray);
+  pointer-events: none;
+  user-select: none;
 }

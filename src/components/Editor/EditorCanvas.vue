@@ -70,14 +70,18 @@ const canvasStyle = computed(() => {
   const wUnit = c.widthUnit ?? 'px'
   const hUnit = c.heightUnit ?? 'px'
 
-  const widthPx = wUnit === '%' ? Math.round(parentSize.value.width * c.width / 100) : c.width
-  const heightPx = hUnit === '%' ? Math.round(parentSize.value.height * c.height / 100) : c.height
+  // 编辑模式有 24px margin（标尺空间），百分比时需扣除 margin
+  const margin = isPreview.value ? 0 : 24
+  const availW = parentSize.value.width - margin * 2
+  const availH = parentSize.value.height - margin * 2
+  const widthPx = wUnit === '%' ? Math.round(availW * c.width / 100) : c.width
+  const heightPx = hUnit === '%' ? Math.round(availH * c.height / 100) : c.height
 
   boardStore.setCanvasPixelSize(widthPx, heightPx)
 
   return {
-    width: wUnit === '%' ? `${c.width}%` : `${c.width}px`,
-    height: hUnit === '%' ? `${c.height}%` : `${c.height}px`,
+    width: wUnit === '%' ? `calc(${c.width}% - ${margin * 2}px)` : `${c.width}px`,
+    height: hUnit === '%' ? `calc(${c.height}% - ${margin * 2}px)` : `${c.height}px`,
     backgroundColor: c.backgroundColor,
     padding: c.padding,
     transform: `scale(${c.zoom / 100})`,
@@ -210,10 +214,26 @@ const { stateMap: linkageStateMap } = useLinkage(
   exposedContext,
 )
 provide(FORM_GRID_LINKAGE_KEY, linkageStateMap)
+
+const isPercentWidth = computed(() => (boardStore.canvas.widthUnit ?? 'px') === '%')
+const isPercentHeight = computed(() => (boardStore.canvas.heightUnit ?? 'px') === '%')
 </script>
 
 <template>
-  <div ref="canvasRef" :class="[styles.canvas, rendererStyles.fg, { [styles.canvasGrid]: !isPreview }]" :style="canvasStyle">
+  <div
+    ref="canvasRef"
+    :class="[
+      styles.canvas,
+      rendererStyles.fg,
+      {
+        [styles.canvasGrid]: !isPreview,
+        [styles.canvasEdit]: !isPreview,
+        [styles.canvasPercentWidth]: !isPreview && isPercentWidth,
+        [styles.canvasPercentHeight]: !isPreview && isPercentHeight,
+      },
+    ]"
+    :style="canvasStyle"
+  >
     <!-- 预览模式：纯净渲染，无编辑交互层 -->
     <SchemaRender v-if="isPreview" :widgets="widgetStore.widgets" />
     <!-- 编辑模式：带选中、拖拽、缩放的交互层 -->
@@ -225,8 +245,6 @@ provide(FORM_GRID_LINKAGE_KEY, linkageStateMap)
       @open-variables="emit('openVariables', $event)"
       @save-preview="emit('savePreview', $event)"
     />
-    <!-- 缩放指示器（仅编辑模式） -->
-    <ZoomIndicator v-if="!isPreview" />
   </div>
 </template>
 

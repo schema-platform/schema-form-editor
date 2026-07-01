@@ -32,7 +32,7 @@ const TYPE_ICONS: Record<string, string> = {
   'single-col': 'grid', 'double-col': 'grid', 'triple-col': 'grid', 'quad-col': 'grid',
   input: 'edit', select: 'arrow-down', number: 'sort', radio: 'circle-check', checkbox: 'check',
   date: 'calendar', textarea: 'edit-pen', title: 'document',
-  divider: 'minus', spacer: 'rank', 'toolbar-buttons': 'set-up', table: 'grid', button: 'click',
+  divider: 'minus', spacer: 'rank', 'toolbar-buttons': 'set-up', table: 'grid', button: 'pointer',
   // 图表部件
   'bar-chart': 'data-board', 'stacked-bar-chart': 'data-board', 'horizontal-bar-chart': 'data-board',
   'line-chart': 'trend-charts', 'area-chart': 'trend-charts',

@@ -415,7 +415,7 @@ function handleVersionPublished() {
               <AppIcon name="upload" class="el-icon--left" />导入
             </el-button>
             <el-button type="primary" @click="openCreateDialog">
-              <AppIcon name="plus" class="el-icon--left" />新建实例
+              <AppIcon name="plus" class="el-icon--left" />新建
             </el-button>
           </div>
         </div>

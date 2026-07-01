@@ -44,6 +44,12 @@ export const useEditorStore = defineStore('editor', () => {
 
   const mode = ref<'edit' | 'preview'>('edit')
 
+  /** 缩放指示器可见性（编辑模式 HUD） */
+  const showZoomIndicator = ref(true)
+  function toggleZoomIndicator() {
+    showZoomIndicator.value = !showZoomIndicator.value
+  }
+
   // ================================================================
   // 撤销/重做（主画布）
   // ================================================================
@@ -288,6 +294,8 @@ export const useEditorStore = defineStore('editor', () => {
     selectedIds,
     // 编辑器模式
     mode,
+    showZoomIndicator,
+    toggleZoomIndicator,
     // 撤销/重做（主画布）
     history,
     historyIndex,

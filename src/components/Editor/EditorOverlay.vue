@@ -36,23 +36,40 @@ interface FlatWidget {
   widget: Widget
   canvasX: number
   canvasY: number
+  widthPx: number
+  heightPx: number
   depth: number
 }
 
-function flattenWidgets(widgets: Widget[], offsetX = 0, offsetY = 0, depth = 0): FlatWidget[] {
+/** Resolve widget w/h to pixels, accounting for % units */
+function resolveSizePx(w: Widget, parentW: number, parentH: number): { w: number; h: number } {
+  const pos = w.position
+  if (!pos) return { w: 0, h: 0 }
+  const wUnit = pos.wUnit ?? 'px'
+  const hUnit = pos.hUnit ?? 'px'
+  return {
+    w: wUnit === '%' ? Math.round(parentW * pos.w / 100) : pos.w,
+    h: hUnit === '%' ? Math.round(parentH * pos.h / 100) : pos.h,
+  }
+}
+
+function flattenWidgets(widgets: Widget[], offsetX = 0, offsetY = 0, depth = 0, parentW = 0, parentH = 0): FlatWidget[] {
   const result: FlatWidget[] = []
+  const canvasW = parentW || boardStore.getCanvasWidthPx()
+  const canvasH = parentH || boardStore.getCanvasHeightPx()
   for (const w of widgets) {
-    // 跳过无效的 widget
     if (!w || !w.position) continue
+    const size = resolveSizePx(w, canvasW, canvasH)
     result.push({
       widget: w,
       canvasX: offsetX + (w.position.x || 0),
       canvasY: offsetY + (w.position.y || 0),
+      widthPx: size.w,
+      heightPx: size.h,
       depth,
     })
-    // 自渲染容器内部是流式布局，子组件绝对坐标与实际位置不匹配，跳过递归
     if (w.children?.length && !SELF_RENDERING_CONTAINERS.has(w.type)) {
-      result.push(...flattenWidgets(w.children, offsetX + (w.position.x || 0), offsetY + (w.position.y || 0), depth + 1))
+      result.push(...flattenWidgets(w.children, offsetX + (w.position.x || 0), offsetY + (w.position.y || 0), depth + 1, size.w, size.h))
     }
   }
   return result
@@ -92,7 +109,9 @@ onUnmounted(() => {
 })
 
 /** 自渲染容器：children 在组件内部渲染，flattenWidgets 跳过其子组件 */
-const SELF_RENDERING_CONTAINERS: ReadonlySet<SchemaType> = new Set()
+const SELF_RENDERING_CONTAINERS: ReadonlySet<SchemaType> = new Set([
+  'single-col', 'double-col', 'triple-col', 'quad-col',
+])
 
 /** 交互式容器：hitArea 设为 pointer-events:none，点击穿透到实际 UI */
 const INTERACTIVE_CONTAINER_TYPES: ReadonlySet<SchemaType> = new Set(['tabs', 'dialog'])
@@ -565,8 +584,8 @@ async function handleTemplateDrop(templateId: string, clientX: number, clientY: 
           position: 'absolute',
           left: `${fw.canvasX + d.mx}px`,
           top: `${fw.canvasY + d.my}px`,
-          width: `${fw.widget.position.w + d.bw}px`,
-          height: `${fw.widget.position.h + d.bh}px`,
+          width: `${fw.widthPx + d.bw}px`,
+          height: `${fw.heightPx + d.bh}px`,
           zIndex: (fw.widget.position.zIndex ?? 1) + 100 + fw.depth * 10,
         }
       })()"

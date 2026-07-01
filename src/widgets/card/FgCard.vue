@@ -6,11 +6,15 @@
  * - el-card 包裹，提供卡片视觉容器
  * - 渲染标题和子组件
  */
-import { inject } from 'vue'
+import { inject, computed } from 'vue'
 import { widgetDataKey } from '../base/types'
 import styles from './style.module.scss'
 
+const props = defineProps<{ editable?: boolean }>()
+
 const widgetData = inject(widgetDataKey)!
+
+const hasChildren = computed(() => (widgetData.value.children?.length ?? 0) > 0)
 </script>
 
 <template>
@@ -21,6 +25,9 @@ const widgetData = inject(widgetDataKey)!
   >
     <div :class="styles.body">
       <slot />
+      <div v-if="props.editable && !hasChildren" :class="styles.ghost">
+        拖入部件
+      </div>
     </div>
   </el-card>
 </template>

@@ -159,6 +159,8 @@ export interface FormGridProps {
   canvasConfig?: {
     width?: number
     height?: number
+    widthUnit?: 'px' | '%'
+    heightUnit?: 'px' | '%'
     backgroundColor?: string
     padding?: string
     zoom?: number

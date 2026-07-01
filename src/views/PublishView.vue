@@ -34,7 +34,7 @@ const formRef = ref<InstanceType<typeof WidgetRenderer>>()
 const appStore = useAppStore()
 
 const schema = ref<PartialWidget[]>([])
-const canvasConfig = ref<{ width?: number; height?: number; backgroundColor?: string; padding?: string; zoom?: number }>({})
+const canvasConfig = ref<{ width?: number; height?: number; widthUnit?: 'px' | '%'; heightUnit?: 'px' | '%'; backgroundColor?: string; padding?: string; zoom?: number }>({})
 const loading = ref(true)
 const error = ref('')
 const schemaName = ref('')

@@ -248,6 +248,12 @@ watch(zoom, () => {
   drawCorner()
   syncScroll()
 })
+
+// 监听画布尺寸/单位变化
+watch(() => [boardStore.canvas.width, boardStore.canvas.height, boardStore.canvas.widthUnit, boardStore.canvas.heightUnit], () => {
+  drawCorner()
+  syncScroll()
+})
 </script>
 
 <template>

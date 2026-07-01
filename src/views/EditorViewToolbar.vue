@@ -265,6 +265,15 @@ function handleClearCanvas() {
         </button>
       </el-tooltip>
       <div :class="styles.divider" />
+      <el-tooltip :content="editorStore.showZoomIndicator ? '隐藏缩放控制' : '显示缩放控制'" placement="bottom">
+        <button
+          :class="[styles.iconBtn, { [styles.iconBtnActive]: editorStore.showZoomIndicator }]"
+          title="缩放控制"
+          @click="editorStore.toggleZoomIndicator()"
+        >
+          <AppIcon name="aim" :size="14" />
+        </button>
+      </el-tooltip>
       <!-- 快捷键帮助 -->
       <el-popover placement="bottom" :width="300" trigger="click">
         <div :class="styles.shortcuts">

@@ -1,7 +1,23 @@
 .canvas {
+  box-sizing: border-box;
   position: relative;
   overflow: auto;
+}
+
+.canvasEdit {
   margin: 24px;
+}
+
+.canvasPercent {
+  margin: 24px 24px 24px 24px;
+}
+
+.canvasPercentWidth {
+  width: calc(100% - 48px) !important;
+}
+
+.canvasPercentHeight {
+  height: calc(100% - 48px) !important;
 }
 
 .canvasGrid {

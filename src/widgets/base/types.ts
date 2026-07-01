@@ -702,6 +702,18 @@ export const formContextKey: InjectionKey<FormContext> = Symbol('FormContext')
 /** 组件暴露值注入 Key — 每个组件 provide 自己的 exposedState */
 export const widgetExposedKey: InjectionKey<Record<string, unknown>> = Symbol('WidgetExposed')
 
+/** 解析后的部件像素尺寸（与 overlay 计算一致） */
+export interface WidgetBounds {
+  widthPx: number
+  heightPx: number
+}
+
+/** 当前部件的解析尺寸 — SchemaNode provide，部件 inject */
+export const widgetBoundsKey: InjectionKey<ComputedRef<WidgetBounds>> = Symbol('WidgetBounds')
+
+/** 父容器解析尺寸 — 嵌套部件用于 % 单位换算 */
+export const parentBoundsKey: InjectionKey<ComputedRef<WidgetBounds>> = Symbol('ParentBounds')
+
 // ============================================================
 // Widget 生命周期
 // ============================================================

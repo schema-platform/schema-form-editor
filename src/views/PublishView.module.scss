@@ -1,5 +1,6 @@
 .fg-renderer {
   min-height: 100vh;
+  height: 100vh;
   background: var(--bg-color-gray);
 
   &__loading,

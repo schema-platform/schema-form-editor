@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import { inject, computed, ref } from 'vue'
-import { widgetDataKey, widgetStyleKey } from '../base/types'
+import { widgetDataKey } from '../base/types'
 import './FgCascader.module.scss'
 import { useWidgetRenderState } from '../../composables/useWidgetRenderState'
 import { useExposeWidget } from '../../composables/useExposeWidget'
 
+import { useWidgetControlSize } from '../../composables/useWidgetControlSize'
+
 const widgetData = inject(widgetDataKey)!
-const widgetStyle = inject(widgetStyleKey)!
 const { isDisabled } = useWidgetRenderState()
+const { controlStyle: dynamicStyle } = useWidgetControlSize(32)
 
 useExposeWidget((wd) => ({
   get value() { return wd.value.defaultValue },
-}))
-
-const dynamicStyle = computed(() => ({
-  width: '100%',
-  height: `${widgetData.value.position?.h ?? 32}px`,
-  '--el-component-size': `${widgetData.value.position?.h ?? 32}px`,
-  '--el-component-size-small': `${widgetData.value.position?.h ?? 32}px`,
-  fontSize: widgetStyle.value?.fontSize as string,
 }))
 
 const cascaderProps = computed(() => ({

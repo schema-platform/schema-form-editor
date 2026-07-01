@@ -28,6 +28,7 @@ import { useEditorStore } from '@/stores/editor'
 import { useApiStore } from '@/stores/api'
 import { registerAllWidgets } from '@/widgets'
 import EditorCanvas from '@/components/Editor/EditorCanvas.vue'
+import ZoomIndicator from '@/components/Editor/ZoomIndicator.vue'
 import EventLogPanel from '@/components/Editor/EventLogPanel.vue'
 import { setLogCollector } from '@/composables/useLogger'
 import { useEventLog } from '@/composables/useEventLog'
@@ -79,6 +80,14 @@ const showLogPanel = ref(false)
 const showCodePanel = ref(false)
 const showAiDrawer = ref(false)
 const showVersionCompare = ref(false)
+
+/** 缩放指示器右侧偏移：属性面板 300px + AI 抽屉 400px */
+const zoomRightOffset = computed(() => {
+  let offset = 0
+  if (rightPanelVisible.value) offset += 300
+  if (showAiDrawer.value) offset += 400
+  return offset
+})
 const aiBaseUrl = import.meta.env.DEV
   ? 'http://localhost:5300/index-sidebar.html'
   : `${window.location.origin}/schema-platform/micro/ai/index-sidebar.html`
@@ -549,6 +558,11 @@ function handleVersionLoadedFromToolbar(version: string) {
             @save-preview="handleSavePreview"
           />
         </div>
+        <!-- 缩放指示器：放在 .center 内，无 transform 祖先，fixed 相对视口 -->
+        <ZoomIndicator
+          v-if="mode === 'edit' && editorStore.showZoomIndicator"
+          :right-offset="zoomRightOffset"
+        />
         <EventLogPanel v-if="mode === 'preview' && showLogPanel" />
 
         <!-- Store 数据面板（全屏覆盖） -->

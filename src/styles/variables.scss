@@ -652,45 +652,11 @@ $fg-nav-menu-height: 44px;
 $fg-nav-indent: 20px;
 $fg-nav-padding: 16px;
 
-// ========== 全局输入组件默认尺寸统一 32px（属性面板 + 配置弹窗） ==========
+// ========== 编辑器 UI 默认控件尺寸（属性面板/弹窗在各自 module 中覆盖） ==========
+// 注意：禁止在此对 .el-input__wrapper 写死 height，否则会覆盖画布内 widget 的配置高度
 .el-input,
 .el-select,
 .el-input-number {
   --el-component-size: 32px;
   --el-component-size-small: 32px;
-}
-
-.el-input .el-input__wrapper {
-  height: 32px;
-  min-height: 32px;
-}
-
-.el-input .el-input__inner {
-  height: 32px;
-}
-
-.el-select .el-select__wrapper {
-  min-height: 32px;
-}
-
-// small 尺寸也统一 32px（覆盖 EP 默认 24px）
-.el-select--small .el-select__wrapper {
-  min-height: 32px;
-  padding: 4px 12px;
-  font-size: 14px;
-  line-height: 24px;
-}
-
-.el-input-number {
-  height: 32px;
-}
-
-.el-input-number .el-input__wrapper {
-  height: 32px;
-  min-height: 32px;
-}
-
-.el-input-number .el-input__inner {
-  height: 32px;
-  line-height: 32px;
 }

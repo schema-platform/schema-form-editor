@@ -26,6 +26,18 @@ function getContainerTypes(): Set<string> {
 /** 默认 position */
 const DEFAULT_POSITION = { x: 0, y: 0, w: 240, h: 40, xUnit: 'px' as const, yUnit: 'px' as const, wUnit: 'px' as const, hUnit: 'px' as const, zIndex: 1 }
 
+/** 将 position 宽高同步到 style，供仍读取 style.width/height 的部件使用 */
+function syncStyleDimensions(widget: Widget): void {
+  const pos = widget.position ?? DEFAULT_POSITION
+  const wUnit = pos.wUnit ?? 'px'
+  const hUnit = pos.hUnit ?? 'px'
+  widget.style = {
+    ...(widget.style ?? {}),
+    width: `${pos.w}${wUnit}`,
+    height: `${pos.h}${hUnit}`,
+  }
+}
+
 /**
  * 递归补全 widget 的 position 字段。
  * 数据库中的旧数据可能缺少 position，导致渲染崩溃。
@@ -45,6 +57,7 @@ function normalizePosition(widgets: Widget[]): Widget[] {
       if (w.position.hUnit === undefined) w.position.hUnit = 'px'
       if (w.position.zIndex === undefined) w.position.zIndex = 1
     }
+    syncStyleDimensions(w)
     if (w.children?.length) {
       w.children = normalizePosition(w.children) as Widget[]
     }
@@ -76,6 +89,7 @@ function checkAndAssignColIndex(
 
 /**
  * 计算列容器中子部件的位置和尺寸
+ * 列宽支持固定 px（>0）和自适应（0），固定列优先占位，剩余空间均分给自适应列。
  */
 function calculateColPosition(
   widget: Widget,
@@ -86,27 +100,42 @@ function calculateColPosition(
   const gutter = (container.props?.gutter as number) || 0
   const colCount = colContainerColumns
   const colIdx = widget.colIndex ?? 0
-  const colPercent = (colWidths[colIdx] ?? (100 / colCount)) / 100
-  const gutterAdj = gutter * (colCount - 1) / colCount
 
-  // 获取容器的实际像素尺寸（处理百分比）
-  const canvasWidth = 1920 // 默认画布宽度，运行时由 boardStore 提供
+  const canvasWidth = 1920
   const canvasHeight = 1080
   const containerWUnit = container.position?.wUnit ?? 'px'
   const containerHUnit = container.position?.hUnit ?? 'px'
   const containerW = containerWUnit === '%' ? (canvasWidth * container.position.w / 100) : container.position.w
   const containerH = containerHUnit === '%' ? (canvasHeight * container.position.h / 100) : container.position.h
 
+  const totalGutter = gutter * (colCount - 1)
+  const availableW = containerW - totalGutter
+
+  const fixedWidths: number[] = []
+  let fixedTotal = 0
+  let autoCount = 0
+  for (let j = 0; j < colCount; j++) {
+    const w = colWidths[j] ?? 0
+    if (w > 0) {
+      fixedWidths[j] = w
+      fixedTotal += w
+    } else {
+      autoCount++
+    }
+  }
+  const autoWidth = autoCount > 0 ? (availableW - fixedTotal) / autoCount : 0
+
   let xOffset = 0
   for (let j = 0; j < colIdx; j++) {
-    const prevPercent = (colWidths[j] ?? (100 / colCount)) / 100
-    xOffset += containerW * prevPercent - gutterAdj + gutter
+    const w = colWidths[j] ?? 0
+    xOffset += (w > 0 ? w : autoWidth) + gutter
   }
+  const myWidth = colWidths[colIdx] > 0 ? colWidths[colIdx] : autoWidth
+
   widget.position.x = xOffset
   widget.position.y = 0
-  widget.position.w = containerW * colPercent - gutterAdj
+  widget.position.w = myWidth
   widget.position.h = containerH
-  // 保留子组件原有的单位设置，不强制为 px
 }
 
 /** 列容器类型 → 列数映射 */
@@ -298,6 +327,7 @@ export const useWidgetStore = defineStore('widget', () => {
         toAdd.push(p)
       }
     }
+    syncStyleDimensions(widget)
     widgets.value = [...widgets.value, ...toAdd]
   }
 
@@ -311,6 +341,9 @@ export const useWidgetStore = defineStore('widget', () => {
     const widget = findWidget(id)
     if (widget) {
       Object.assign(widget, patch)
+      if (patch.position) {
+        syncStyleDimensions(widget)
+      }
     }
   }
 
@@ -331,6 +364,7 @@ export const useWidgetStore = defineStore('widget', () => {
     if (widget) {
       widget.position.w = Math.max(20, w)
       widget.position.h = Math.max(20, h)
+      syncStyleDimensions(widget)
     }
   }
 

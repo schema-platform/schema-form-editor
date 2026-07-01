@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { inject, computed } from 'vue'
-import { widgetDataKey, widgetStyleKey } from '../base/types'
+import { inject } from 'vue'
+import { widgetDataKey } from '../base/types'
 import { useExposeWidget } from '../../composables/useExposeWidget'
+import { useWidgetLayoutStyle } from '../../composables/useWidgetControlSize'
 import styles from './style.module.scss'
 
 const widgetData = inject(widgetDataKey)!
-const widgetStyle = inject(widgetStyleKey)!
+const { layoutStyle: dynamicStyle } = useWidgetLayoutStyle(200)
 
 useExposeWidget((wd) => ({
   get value() { return wd.value.defaultValue },
-}))
-
-const dynamicStyle = computed(() => ({
-  width: widgetStyle.value?.width as string || '100%',
-  height: widgetStyle.value?.height as string || '200px',
-  fontSize: widgetStyle.value?.fontSize as string,
-  color: widgetStyle.value?.color as string,
 }))
 </script>
 

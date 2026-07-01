@@ -16,13 +16,15 @@
  * - 使用缓存的组件映射表
  */
 import { computed, inject, provide, ref, onMounted, onUnmounted, type ComputedRef, type ComponentPublicInstance } from 'vue'
-import { widgetDataKey, widgetStyleKey, widgetRenderStateKey, formContextKey } from '../../widgets/base/types'
+import { widgetDataKey, widgetStyleKey, widgetRenderStateKey, formContextKey, widgetBoundsKey, parentBoundsKey, type WidgetBounds } from '../../widgets/base/types'
 import type { Widget, SchemaType, LinkageState } from '../../widgets/base/types'
 import type { FormData, EventExecutionContext } from './types'
 import { EVENT_CONTEXT_KEY, DIALOG_REGISTRY_KEY, FORM_GRID_LINKAGE_KEY } from './types'
 import { getComponentMap } from '../../widgets/registry'
 import { useWidgetStore } from '../../stores/widget'
 import { useEditorStore } from '../../stores/editor'
+import { useBoardStore } from '../../stores/board'
+import { resolveWidgetSize } from '../../utils/unitResolver'
 import { triggerWidgetEvent } from '../../engine/eventEngine'
 import { useLogger } from '../../composables/useLogger'
 import SchemaRender from './SchemaRender.vue'
@@ -139,6 +141,26 @@ const filteredChildren = computed(() => {
 
 const widgetStore = useWidgetStore()
 const editorStore = useEditorStore()
+const boardStore = useBoardStore()
+
+/** 父容器像素尺寸（嵌套部件 % 换算基准，根级默认为画布） */
+const parentBounds = inject(parentBoundsKey, computed<WidgetBounds>(() => ({
+  widthPx: boardStore.getCanvasWidthPx(),
+  heightPx: boardStore.getCanvasHeightPx(),
+})))
+
+/** 当前部件解析尺寸 — 与 EditorOverlay hitArea 算法一致 */
+const resolvedBounds = computed<WidgetBounds>(() => {
+  const { w, h } = resolveWidgetSize(
+    props.widget,
+    parentBounds.value.widthPx,
+    parentBounds.value.heightPx,
+  )
+  return { widthPx: w, heightPx: h }
+})
+
+provide(widgetBoundsKey, resolvedBounds)
+provide(parentBoundsKey, resolvedBounds)
 
 /** 交互式容器空白区域点击 → 选中容器 */
 function handleInteractiveContainerClick() {
@@ -314,7 +336,7 @@ const wrapperStyle = computed(() => {
       <div
         v-if="isEditMode"
         :data-widget-id="widget.id"
-        :class="[styles.nodeWrapper, styles.nodeWrapperEdit, styles.interactiveContainer]"
+        :class="[styles.nodeWrapper, styles.nodeWrapperContainer, styles.nodeWrapperEdit, styles.interactiveContainer]"
         :style="wrapperStyle"
         @click.stop="handleInteractiveContainerClick()"
       >
@@ -372,6 +394,7 @@ const wrapperStyle = computed(() => {
       :data-widget-id="widget.id"
       :class="[
         styles.nodeWrapper,
+        styles.nodeWrapperContainer,
         {
           [styles.nodeWrapperEdit]: isEditMode,
           [styles.interactiveContainer]: INTERACTIVE_CONTAINER_TYPES.has(widget.type),
@@ -406,7 +429,7 @@ const wrapperStyle = computed(() => {
     <div
       v-else
       :data-widget-id="widget.id"
-      :class="[styles.nodeWrapper, { [styles.nodeWrapperEdit]: isEditMode }]"
+      :class="[styles.nodeWrapper, styles.nodeWrapperBase, { [styles.nodeWrapperEdit]: isEditMode }]"
       :style="wrapperStyle"
       @change="FORM_COMPONENT_TYPES.has(widget.type) && (isEditMode ? handleWidgetEvent('change', $event) : handlePreviewEvent('change', $event))"
       @focus="INPUT_COMPONENT_TYPES.has(widget.type) && (isEditMode ? handleWidgetEvent('focus') : handlePreviewEvent('focus'))"

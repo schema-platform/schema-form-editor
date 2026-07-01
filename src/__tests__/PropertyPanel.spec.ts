@@ -431,7 +431,7 @@ describe('PropertyPanel', () => {
     await nextTick()
 
     expect(updateSpy).toHaveBeenCalledWith('input_test1', {
-      style: { width: '300px', fontSize: '14px' },
+      style: { width: '300px', height: '32px', fontSize: '14px' },
     })
   })
 

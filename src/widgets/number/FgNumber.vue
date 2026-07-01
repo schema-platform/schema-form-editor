@@ -1,29 +1,23 @@
 <script setup lang="ts">
 import { inject, computed, ref } from 'vue'
-import { widgetDataKey, widgetStyleKey } from '../base/types'
+import { widgetDataKey } from '../base/types'
 import './FgNumber.module.scss'
 import { useWidgetRenderState } from '../../composables/useWidgetRenderState'
 import { useExposeWidget } from '../../composables/useExposeWidget'
 
+import { useWidgetControlSize } from '../../composables/useWidgetControlSize'
+
 const widgetData = inject(widgetDataKey)!
-const widgetStyle = inject(widgetStyleKey)!
 const { isDisabled } = useWidgetRenderState()
+const { widgetHeight, controlStyle } = useWidgetControlSize(32)
 
 useExposeWidget((wd) => ({
   get value() { return wd.value.defaultValue },
 }))
 
-const widgetHeight = computed(() => widgetData.value.position?.h ?? 32)
-const buttonHeight = computed(() => Math.floor(widgetHeight.value / 2))
-
 const dynamicStyle = computed(() => ({
-  width: '100%',
-  height: `${widgetHeight.value}px`,
-  '--el-component-size': `${widgetHeight.value}px`,
-  '--el-component-size-small': `${widgetHeight.value}px`,
-  '--number-btn-height': `${buttonHeight.value}px`,
-  fontSize: widgetStyle.value?.fontSize as string,
-  color: widgetStyle.value?.color as string,
+  ...controlStyle.value,
+  '--number-btn-height': `${Math.floor(widgetHeight.value / 2)}px`,
 }))
 
 const numberRef = ref<{ $el?: HTMLElement }>()

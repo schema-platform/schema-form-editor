@@ -1,26 +1,28 @@
 <script setup lang="ts">
 import { inject, computed, ref } from 'vue'
-import { widgetDataKey, widgetStyleKey } from '../base/types'
+import { widgetDataKey } from '../base/types'
 import './FgTransfer.module.scss'
 import { useExposeWidget } from '../../composables/useExposeWidget'
+import { useWidgetControlSize } from '../../composables/useWidgetControlSize'
+
 const widgetData = inject(widgetDataKey)!
-const widgetStyle = inject(widgetStyleKey)!
+const { widgetWidth, controlStyle } = useWidgetControlSize(300, 700)
 const value = ref<Array<string | number>>([])
 useExposeWidget(() => ({
   get value() { return value.value },
 }))
 const dynamicStyle = computed(() => ({
-  fontSize: widgetStyle.value?.fontSize as string,
-  color: widgetStyle.value?.color as string,
+  fontSize: controlStyle.value.fontSize,
+  color: controlStyle.value.color,
 }))
 const titles = computed(() => [
   (widgetData.value.props?.leftTitle as string) || '待选',
   (widgetData.value.props?.rightTitle as string) || '已选',
 ])
 
-/** 根据 position.w 计算每个面板的宽度：(总宽 - 按钮区 - 间距) / 2 */
+/** 根据解析宽度计算每个面板宽度：(总宽 - 按钮区) / 2 */
 const panelWidth = computed(() => {
-  const totalW = widgetData.value.position?.w ?? 700
+  const totalW = widgetWidth.value
   const btnArea = 124
   return Math.max(0, (totalW - btnArea) / 2)
 })

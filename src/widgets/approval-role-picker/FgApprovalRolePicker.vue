@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { inject, computed, ref } from 'vue'
-import { widgetDataKey, widgetStyleKey } from '../base/types'
+import { widgetDataKey } from '../base/types'
 import { useWidgetRenderState } from '../../composables/useWidgetRenderState'
 import { useExposeWidget } from '../../composables/useExposeWidget'
 
+import { useWidgetControlSize } from '../../composables/useWidgetControlSize'
+
 const widgetData = inject(widgetDataKey)!
-const widgetStyle = inject(widgetStyleKey)!
 const { isDisabled } = useWidgetRenderState()
+const { controlStyle: dynamicStyle } = useWidgetControlSize(40)
 
 interface RoleItem {
   id: string
@@ -31,15 +33,6 @@ useExposeWidget((wd) => ({
     const found = options.value.find(r => r.id === val)
     return found?.name ?? ''
   },
-}))
-
-const dynamicStyle = computed(() => ({
-  width: '100%',
-  height: `${widgetData.value.position?.h ?? 40}px`,
-  '--el-component-size': `${widgetData.value.position?.h ?? 40}px`,
-  '--el-component-size-small': `${widgetData.value.position?.h ?? 40}px`,
-  fontSize: widgetStyle.value?.fontSize as string,
-  color: widgetStyle.value?.color as string,
 }))
 
 const selectRef = ref<{ $el?: HTMLElement }>()

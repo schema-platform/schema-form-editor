@@ -3,10 +3,16 @@
  * ZoomIndicator — 画布缩放指示器
  *
  * 浮动在画布右下角，显示当前缩放百分比，支持 +/- 操作和一键重置。
+ * 右侧偏移量根据 AI 抽屉是否展开动态调整。
  */
 import { computed } from 'vue'
 import { useBoardStore } from '@/stores/board'
 import styles from './ZoomIndicator.module.scss'
+
+const props = defineProps<{
+  /** 右侧抽屉宽度（AI 抽屉展开时传入 400，否则 0） */
+  rightOffset?: number
+}>()
 
 const boardStore = useBoardStore()
 
@@ -15,21 +21,23 @@ const canZoomOut = computed(() => zoom.value > 50)
 const canZoomIn = computed(() => zoom.value < 200)
 const isDefaultZoom = computed(() => zoom.value === 100)
 
+const containerStyle = computed(() => ({
+  right: `${(props.rightOffset ?? 0) + 12}px`,
+}))
+
 function zoomIn() {
   boardStore.setZoom(zoom.value + 10)
 }
-
 function zoomOut() {
   boardStore.setZoom(zoom.value - 10)
 }
-
 function resetZoom() {
   boardStore.setZoom(100)
 }
 </script>
 
 <template>
-  <div :class="styles.container">
+  <div :class="styles.container" :style="containerStyle">
     <button :class="styles.btn" :disabled="!canZoomOut" title="缩小" @click="zoomOut">-</button>
     <span :class="styles.value">{{ zoom }}%</span>
     <button :class="styles.btn" :disabled="!canZoomIn" title="放大" @click="zoomIn">+</button>

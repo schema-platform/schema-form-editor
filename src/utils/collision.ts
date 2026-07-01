@@ -50,7 +50,8 @@ export function detectContainerCollision(
     if (container.id === widget.id) continue
     if (!container.position) continue
     const cp = container.position
-    const area = overlapArea(wx, wy, ww, wh, cp.x, cp.y, cp.w, cp.h)
+    const { w: cw2, h: ch2 } = resolveWidgetSize(container, cw, ch)
+    const area = overlapArea(wx, wy, ww, wh, cp.x, cp.y, cw2, ch2)
     if (area >= widgetArea * 0.5) {
       return container
     }
@@ -92,8 +93,7 @@ export function detectNestedContainerCollision(
     if (!container.position) continue
     const cx = container._canvasX
     const cy = container._canvasY
-    const containerW = container.position.w
-    const containerH = container.position.h
+    const { w: containerW, h: containerH } = resolveWidgetSize(container, cw, ch)
     const area = overlapArea(wx, wy, ww, wh, cx, cy, containerW, containerH)
     if (area >= widgetArea * 0.5) {
       const depth = (container as { _depth?: number })._depth ?? 0
