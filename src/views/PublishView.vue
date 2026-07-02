@@ -57,7 +57,6 @@ function buildQueryVariables(query: Record<string, unknown>): Record<string, unk
   const aliasMap: Record<string, string> = {
     recordId: 'recordId',
     submissionId: 'recordId',
-    id: 'recordId',
     mode: 'mode',
     flowDef: 'flowDefinitionId',
     flowDefinitionId: 'flowDefinitionId',
@@ -129,6 +128,17 @@ async function loadSchema(id: string) {
 }
 
 watch(schemaId, (id) => { if (id) loadSchema(id) }, { immediate: true })
+
+watch(
+  () => route.query,
+  (query) => {
+    boardVariables.value = {
+      ...boardVariables.value,
+      ...buildQueryVariables(query as Record<string, unknown>),
+    }
+  },
+  { deep: true },
+)
 
 // ---- postMessage 通信（iframe 嵌入场景） ----
 

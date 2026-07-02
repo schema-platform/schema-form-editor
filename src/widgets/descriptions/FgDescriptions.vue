@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { inject, computed, ref, onMounted } from 'vue'
+import { inject, computed, ref, onMounted, type ComputedRef } from 'vue'
 import { widgetDataKey } from '../base/types'
 import { useExposeWidget } from '../../composables/useExposeWidget'
 import { fetchWidgetDataSource } from '@/api/widgetApi'
+import { resolveWidgetUrl } from '@/utils/resolveWidgetUrl'
 import type { DescriptionItemConfig } from './config'
 import styles from './style.module.scss'
 
 const widgetData = inject(widgetDataKey)!
+const variablesContext = inject<ComputedRef<Record<string, unknown>>>(
+  'variablesContext',
+  computed(() => ({})),
+)
 
 const data = ref<Record<string, unknown>>({})
 const loading = ref(false)
@@ -31,7 +36,8 @@ async function loadData() {
 
   loading.value = true
   try {
-    data.value = await fetchWidgetDataSource(api.url)
+    const resolvedUrl = resolveWidgetUrl(api.url, variablesContext.value)
+    data.value = await fetchWidgetDataSource(resolvedUrl)
   } catch (err) {
     console.error('[FgDescriptions] Failed to load data:', err)
   } finally {
