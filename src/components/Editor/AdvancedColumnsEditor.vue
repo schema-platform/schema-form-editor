@@ -148,6 +148,26 @@ function optionsToText(opts?: Array<{ label: string; value: unknown }>): string 
   return opts ? JSON.stringify(opts, null, 2) : ''
 }
 
+// ---- Filters helpers ----
+
+function addFilter(colIndex: number) {
+  const filters = [...(props.columns[colIndex].filters || [])]
+  filters.push({ text: '', value: '' })
+  updateColumn(colIndex, 'filters', filters)
+}
+
+function removeFilter(colIndex: number, filterIndex: number) {
+  const filters = (props.columns[colIndex].filters || []).filter((_, i) => i !== filterIndex)
+  updateColumn(colIndex, 'filters', filters.length ? filters : undefined)
+}
+
+function updateFilter(colIndex: number, filterIndex: number, field: 'text' | 'value', value: string) {
+  const filters = (props.columns[colIndex].filters || []).map((f, i) =>
+    i === filterIndex ? { ...f, [field]: value } : f,
+  )
+  updateColumn(colIndex, 'filters', filters)
+}
+
 // ---- Column API helpers ----
 
 function updateColumnApi(index: number, patch: Partial<SchemaApiConfig>) {
@@ -327,6 +347,36 @@ function toggleButtonEvents(key: string) {
       <div :class="styles['adv-columns-editor__field']">
         <label :class="styles['adv-columns-editor__label']">列筛选</label>
         <el-switch :model-value="col.filterable ?? false" @update:model-value="(v: boolean) => updateColumn(idx, 'filterable', v)" />
+      </div>
+
+      <div v-if="col.filterable" :class="styles['adv-columns-editor__filters-section']">
+        <label :class="styles['adv-columns-editor__label']">筛选项</label>
+        <div :class="styles['adv-columns-editor__empty-hint']">
+          留空则运行时从 options 或当前页数据自动生成
+        </div>
+        <div v-if="!col.filters?.length" :class="styles['adv-columns-editor__empty-hint']">暂无自定义筛选项</div>
+        <div
+          v-for="(filter, fi) in col.filters"
+          :key="fi"
+          :class="styles['adv-columns-editor__filter-item']"
+        >
+          <div :class="styles['adv-columns-editor__row']">
+            <div :class="styles['adv-columns-editor__field']">
+              <label :class="styles['adv-columns-editor__label']">显示文字</label>
+              <el-input :model-value="filter.text" size="small" placeholder="审批中" @update:model-value="(v: string) => updateFilter(idx, fi, 'text', v)" />
+            </div>
+            <div :class="styles['adv-columns-editor__field']">
+              <label :class="styles['adv-columns-editor__label']">匹配值</label>
+              <el-input :model-value="String(filter.value ?? '')" size="small" placeholder="submitted" @update:model-value="(v: string) => updateFilter(idx, fi, 'value', v)" />
+            </div>
+          </div>
+          <el-button type="danger" size="small" text @click="removeFilter(idx, fi)">
+            <AppIcon name="delete" /> 移除
+          </el-button>
+        </div>
+        <el-button type="primary" size="small" plain style="width:100%;margin-top:6px" @click="addFilter(idx)">
+          <AppIcon name="plus" /> 添加筛选项
+        </el-button>
       </div>
 
       <!-- link render fields -->

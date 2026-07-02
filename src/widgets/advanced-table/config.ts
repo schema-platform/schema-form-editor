@@ -85,14 +85,14 @@ export const advancedTableConfig: WidgetConfig = {
   defaultProps: {
     columns: [
       { prop: 'applicantName', label: '申请人', minWidth: 100, render: 'text' },
-      { prop: 'leaveType', label: '假别', minWidth: 90, render: 'tag', options: [
+      { prop: 'leaveType', label: '假别', minWidth: 90, render: 'tag', filterable: true, options: [
         { label: '年假', value: 'annual' },
         { label: '病假', value: 'sick' },
         { label: '事假', value: 'personal' },
         { label: '婚假', value: 'marriage' },
       ] },
       { prop: 'days', label: '天数', width: 80, align: 'center', render: 'text' },
-      { prop: 'status', label: '状态', minWidth: 100, render: 'tag', colorMap: {
+      { prop: 'status', label: '状态', minWidth: 100, render: 'tag', filterable: true, colorMap: {
         submitted: 'warning',
         approved: 'success',
         rejected: 'danger',

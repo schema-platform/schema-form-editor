@@ -9,6 +9,7 @@ import { evaluateCondition } from '../../engine/eventEngine'
 import type { ListApiConfig } from '../../components/WidgetRenderer/types'
 import type { AdvancedTableColumn, ActionButton, AdvPaginationConfig, AdvSelectionConfig } from './config'
 import { getRowCellValue } from './tableRowValue'
+import { resolveColumnFilters } from './columnFilters'
 import {
   WIDGET_SURFACE_KEY,
   getTableRowsFromMock,
@@ -119,6 +120,10 @@ function onSelectionChange(rows: Record<string, unknown>[]) {
 
 function defaultFilterMethod(prop: string) {
   return (value: unknown, row: Record<string, unknown>) => getRowCellValue(row, prop) === value
+}
+
+function columnFilters(col: AdvancedTableColumn) {
+  return resolveColumnFilters(col, tableData.value)
 }
 
 // ---- Page change ----
@@ -323,8 +328,8 @@ defineExpose({
         :fixed="col.fixed"
         :align="col.align"
         :sortable="col.sortable !== undefined ? col.sortable : (globalSortable ? 'custom' : false)"
-        :filters="col.filters"
-        :filter-method="col.filters ? (col.filterMethod ?? defaultFilterMethod(col.prop)) : undefined"
+        :filters="columnFilters(col)"
+        :filter-method="columnFilters(col) ? (col.filterMethod ?? defaultFilterMethod(col.prop)) : undefined"
         :show-overflow-tooltip="col.showTooltip && col.render !== 'tooltip'"
       >
         <template #default="{ row, $index }">
