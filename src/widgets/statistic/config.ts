@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '../base/types'
+import { statisticMock } from './mock'
 
 export const statisticConfig: WidgetConfig = {
   name: 'FgStatistic',
@@ -10,15 +11,8 @@ export const statisticConfig: WidgetConfig = {
     height: '120px',
   },
   defaultProps: {
-    title: '总用户数',
-    value: 12345,
-    prefix: '',
-    suffix: '',
-    precision: 0,
-    trend: 'up' as 'up' | 'down' | 'flat',
-    trendValue: '',
+    ...statisticMock.defaultProps,
     icon: '',
-    color: '#409EFF',
     valueFontSize: '28px',
     titleFontSize: '14px',
   },

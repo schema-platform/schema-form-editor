@@ -8,10 +8,16 @@ import { triggerWidgetEvent } from '../../engine/eventEngine'
 import { evaluateCondition } from '../../engine/eventEngine'
 import type { ListApiConfig } from '../../components/WidgetRenderer/types'
 import type { AdvancedTableColumn, ActionButton, AdvPaginationConfig, AdvSelectionConfig } from './config'
+import {
+  WIDGET_SURFACE_KEY,
+  getTableRowsFromMock,
+  shouldUseWidgetMock,
+} from '../base/widgetMock'
 import styles from './style.module.scss'
 
 const widgetData = inject(widgetDataKey)!
 const eventCtx = inject(EVENT_CONTEXT_KEY, null)
+const surface = inject(WIDGET_SURFACE_KEY, 'runtime')
 
 // ---- Schema config ----
 
@@ -220,15 +226,32 @@ function getTooltipContent(col: AdvancedTableColumn, row: Record<string, unknown
 
 // ---- Auto-load ----
 
+function applyEditorMockIfNeeded() {
+  const hasApi = !!listApiConfig.url
+  if (!shouldUseWidgetMock(surface, hasApi)) return
+  const mock = getTableRowsFromMock(widgetData.value.type)
+  if (!mock) return
+  tableData.value = mock.rows
+  total.value = mock.total
+}
+
 onMounted(() => {
-  if (listApiConfig.url) fetchData()
+  if (listApiConfig.url) {
+    fetchData()
+  } else {
+    applyEditorMockIfNeeded()
+  }
 })
 
 watch(
   () => listApiConfig.url,
   (url) => {
     if (url) fetchData()
-    else tableData.value = []
+    else {
+      tableData.value = []
+      total.value = 0
+      applyEditorMockIfNeeded()
+    }
   },
 )
 

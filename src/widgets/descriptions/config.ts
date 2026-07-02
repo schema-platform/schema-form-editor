@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '../base/types'
+import { descriptionsMock } from './mock'
 
 /** 描述列表单项的值类型 */
 export type DescriptionItemType = 'text' | 'tag' | 'link' | 'image' | 'date'
@@ -38,13 +39,19 @@ export const descriptionsConfig: WidgetConfig = {
   ],
   configPanels: ['events', 'api', 'variables'],
   defaultProps: {
-    title: '详情',
+    title: '请假详情',
     column: 2,
     border: true,
-    staticData: { field1: '示例值1', field2: '示例值2' },
+    staticData: descriptionsMock.staticData,
     items: [
-      { label: '字段1', field: 'field1', type: 'text' },
-      { label: '字段2', field: 'field2', type: 'text' },
+      { label: '申请人', field: 'applicantName', type: 'text' },
+      { label: '假别', field: 'leaveType', type: 'text' },
+      { label: '开始时间', field: 'startTime', type: 'text' },
+      { label: '结束时间', field: 'endTime', type: 'text' },
+      { label: '天数', field: 'days', type: 'text', suffix: '天' },
+      { label: '部门', field: 'deptName', type: 'text' },
+      { label: '状态', field: 'status', type: 'tag' },
+      { label: '事由', field: 'reason', type: 'text', span: 2 },
     ],
   },
   propertyPanel: {

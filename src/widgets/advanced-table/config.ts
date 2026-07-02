@@ -76,7 +76,7 @@ export interface AdvSelectionConfig {
 export const advancedTableConfig: WidgetConfig = {
   name: 'FgAdvancedTable',
   displayName: '高级表格',
-  description: '业务数据表格，支持列渲染、行内按钮、工具栏、批量操作、事件绑定、参数传递',
+  description: '业务数据表格。设计器无 API 时使用 mock.ts 预览；配置 API 后走真实数据。',
   author: 'yangdongnan',
   defaultStyle: {
     width: '100%',
@@ -84,16 +84,32 @@ export const advancedTableConfig: WidgetConfig = {
   },
   defaultProps: {
     columns: [
-      { prop: 'name', label: '姓名', minWidth: 120, render: 'text' },
-      { prop: 'status', label: '状态', minWidth: 100, render: 'tag', colorMap: { '启用': 'success', '停用': 'danger' } },
+      { prop: 'applicantName', label: '申请人', minWidth: 100, render: 'text' },
+      { prop: 'leaveType', label: '假别', minWidth: 90, render: 'tag', options: [
+        { label: '年假', value: 'annual' },
+        { label: '病假', value: 'sick' },
+        { label: '事假', value: 'personal' },
+        { label: '婚假', value: 'marriage' },
+      ] },
+      { prop: 'days', label: '天数', width: 80, align: 'center', render: 'text' },
+      { prop: 'status', label: '状态', minWidth: 100, render: 'tag', colorMap: {
+        submitted: 'warning',
+        approved: 'success',
+        rejected: 'danger',
+      }, options: [
+        { label: '审批中', value: 'submitted' },
+        { label: '已通过', value: 'approved' },
+        { label: '已驳回', value: 'rejected' },
+      ] },
+      { prop: 'reason', label: '事由', minWidth: 180, render: 'text', showTooltip: true },
       { prop: 'action', label: '操作', width: 160, fixed: 'right', render: 'buttons', buttons: [
-        { key: 'edit', label: '编辑', type: 'primary', size: 'small' },
-        { key: 'delete', label: '删除', type: 'danger', size: 'small', confirm: '确认删除？' },
+        { key: 'view', label: '查看', type: 'primary', size: 'small' },
+        { key: 'approve', label: '审批', type: 'success', size: 'small' },
       ] },
     ] as AdvancedTableColumn[],
     toolbar: [
-      { key: 'add', label: '新增', type: 'primary', icon: 'plus' },
-      { key: 'batchDelete', label: '批量删除', type: 'danger', visibleCondition: 'selectedRows.length > 0' },
+      { key: 'add', label: '发起申请', type: 'primary', icon: 'plus' },
+      { key: 'export', label: '导出', type: 'default' },
     ] as ActionButton[],
     stripe: true,
     border: true,

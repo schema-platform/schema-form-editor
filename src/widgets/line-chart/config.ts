@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '../base/types'
+import { lineChartMock } from './mock'
 
 export const lineChartConfig: WidgetConfig = {
   name: 'FgLineChart',
@@ -7,13 +8,7 @@ export const lineChartConfig: WidgetConfig = {
   author: 'yangdongnan',
   defaultStyle: { width: '100%', height: '400px' },
   defaultProps: {
-    staticData: [
-      { category: '1月', value: 120 },
-      { category: '2月', value: 200 },
-      { category: '3月', value: 150 },
-      { category: '4月', value: 80 },
-      { category: '5月', value: 170 },
-    ] as Record<string, unknown>[],
+    staticData: lineChartMock.staticData,
     xField: 'category',
     yField: 'value',
     xAxisName: '',

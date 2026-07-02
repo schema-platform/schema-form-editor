@@ -22,6 +22,7 @@ import type { Widget } from '../../widgets/base/types'
 import type { PartialWidget, DialogRegistry, EventExecutionContext, FormFieldValue } from '../WidgetRenderer/types'
 import { triggerWidgetEvent } from '../../engine'
 import { EVENT_CONTEXT_KEY, DIALOG_REGISTRY_KEY, FORM_GRID_LINKAGE_KEY } from '../WidgetRenderer/types'
+import { WIDGET_SURFACE_KEY } from '../../widgets/base/widgetMock'
 import { useLinkage } from '../../composables/useLinkage'
 import styles from './EditorCanvas.module.scss'
 import rendererStyles from '../WidgetRenderer/style.module.scss'
@@ -214,6 +215,8 @@ const { stateMap: linkageStateMap } = useLinkage(
   exposedContext,
 )
 provide(FORM_GRID_LINKAGE_KEY, linkageStateMap)
+
+provide(WIDGET_SURFACE_KEY, 'editor')
 
 const isPercentWidth = computed(() => (boardStore.canvas.widthUnit ?? 'px') === '%')
 const isPercentHeight = computed(() => (boardStore.canvas.heightUnit ?? 'px') === '%')

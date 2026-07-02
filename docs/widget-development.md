@@ -8,11 +8,83 @@
 widgets/form/input/
 ├── index.ts          # 导出
 ├── config.ts         # 配置（属性面板、默认值）
+├── mock.ts           # 可选：复杂部件的默认可视化数据（见下文）
 ├── schema.ts         # 工厂函数
 ├── FgInput.vue       # 组件实现
 ├── style.module.scss # 样式（CSS Module）
 └── __tests__/        # 测试
 ```
+
+## Mock 数据（复杂部件）
+
+依赖 API 或静态数据的**复杂部件**（高级表格、图表、描述列表、统计卡片等）应在部件目录下增加 `mock.ts`，与 `config.ts` 同级：
+
+```
+widgets/table/advanced-table/
+├── config.ts
+├── mock.ts          # 设计器预览用默认数据
+├── schema.ts
+└── FgAdvancedTable.vue
+```
+
+### 约定
+
+| 项目 | 说明 |
+|------|------|
+| **用途** | 设计器画布在未配置 API 时展示真实感数据，便于排布列 tag/按钮/tooltip |
+| **运行时** | `PublishView` / `WidgetRenderer` 注入 `surface='runtime'`，无 API 时不加载 mock |
+| **默认值** | `config.ts` 的 `defaultProps` 从 `mock.ts` 导入（图表/描述列表/统计卡片） |
+| **表格** | 组件内通过 `shouldUseWidgetMock()` 判断后调用 `getTableRowsFromMock(type)` |
+| **登记** | 新复杂部件在 `widgets/base/widgetMock.ts` 的 `MOCK_REGISTRY` 注册 |
+
+### mock.ts 示例
+
+```ts
+// widgets/bar-chart/mock.ts
+import type { ChartWidgetMock } from '../base/widgetMock'
+
+export const barChartMock: ChartWidgetMock = {
+  kind: 'chart',
+  staticData: [
+    { category: '1月', value: 42 },
+    { category: '2月', value: 38 },
+  ],
+}
+```
+
+```ts
+// config.ts
+import { barChartMock } from './mock'
+
+defaultProps: {
+  staticData: barChartMock.staticData,
+  // ...
+}
+```
+
+### 表格类组件接入
+
+```ts
+import { WIDGET_SURFACE_KEY, getTableRowsFromMock, shouldUseWidgetMock } from '../base/widgetMock'
+
+const surface = inject(WIDGET_SURFACE_KEY, 'runtime')
+
+function applyEditorMockIfNeeded() {
+  const hasApi = !!listApiConfig.url
+  if (!shouldUseWidgetMock(surface, hasApi)) return
+  const mock = getTableRowsFromMock(widgetData.value.type)
+  if (!mock) return
+  tableData.value = mock.rows
+  total.value = mock.total
+}
+```
+
+### 渲染表面注入
+
+- `EditorCanvas` → `provide(WIDGET_SURFACE_KEY, 'editor')`
+- `WidgetRenderer` → `provide(WIDGET_SURFACE_KEY, 'runtime')`
+
+业务场景 mock 建议与平台文档对齐（如请假台账、工作台 KPI），便于 Board 交付物直接复用。
 
 ## 开发步骤
 
