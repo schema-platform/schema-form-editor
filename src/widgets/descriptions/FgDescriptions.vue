@@ -12,6 +12,7 @@ const variablesContext = inject<ComputedRef<Record<string, unknown>>>(
   'variablesContext',
   computed(() => ({})),
 )
+const setBoardVariable = inject<(name: string, value: unknown) => void>('setBoardVariable', () => {})
 
 const data = ref<Record<string, unknown>>({})
 const loading = ref(false)
@@ -38,6 +39,8 @@ async function loadData() {
   try {
     const resolvedUrl = resolveWidgetUrl(api.url, variablesContext.value)
     data.value = await fetchWidgetDataSource(resolvedUrl)
+    if (data.value.flowInstanceId) setBoardVariable('flowInstanceId', data.value.flowInstanceId)
+    if (data.value.taskId) setBoardVariable('taskId', data.value.taskId)
   } catch (err) {
     console.error('[FgDescriptions] Failed to load data:', err)
   } finally {

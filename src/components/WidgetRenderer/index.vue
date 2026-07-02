@@ -236,6 +236,9 @@ provide('registerExposed', registerExposed)
 provide('unregisterExposed', unregisterExposed)
 provide('variablesContext', variablesContext)
 provide('exposedContext', exposedContext)
+provide('setBoardVariable', (name: string, value: unknown) => {
+  runtimeVariables.value = { ...runtimeVariables.value, [name]: value }
+})
 
 // 联动状态（支持 variables 和 exposed 引用）
 const { stateMap: linkageStateMap } = useLinkage(props.schema, formData, variablesContext, exposedContext)

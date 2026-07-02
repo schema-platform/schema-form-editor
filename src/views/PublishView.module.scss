@@ -3,6 +3,24 @@
   height: 100vh;
   background: var(--bg-color-gray);
 
+  &--with-sidebar {
+    display: flex;
+    height: 100vh;
+  }
+
+  &__ai-sidebar {
+    width: 360px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--el-border-color-lighter);
+    background: #fff;
+  }
+
+  &__ai-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
   &__loading,
   &__error {
     display: flex;

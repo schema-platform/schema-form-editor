@@ -11,6 +11,12 @@ import { lineChartMock } from '../line-chart/mock'
 import { pieChartMock } from '../pie-chart/mock'
 import { statisticMock } from '../statistic/mock'
 import { descriptionsMock } from '../descriptions/mock'
+import { flowTimelineMock } from '../flow-timeline/mock'
+import { calendarMock } from '../calendar/mock'
+import { notificationMock } from '../notification/mock'
+import { dynamicDetailTableMock } from '../dynamic-detail-table/mock'
+import { complianceChecklistMock } from '../compliance-checklist/mock'
+import { qrScannerMock } from '../qr-scanner/mock'
 
 /** 渲染表面：editor=设计器画布，runtime=PublishView/正式运行时 */
 export type WidgetSurface = 'editor' | 'runtime'
@@ -73,6 +79,13 @@ export const COMPLEX_WIDGET_MOCK_TYPES = [
   'descriptions',
   'user-management',
   'role-management',
+  'flow-timeline',
+  'flow-task-actions',
+  'calendar',
+  'notification',
+  'dynamic-detail-table',
+  'compliance-checklist',
+  'qr-scanner',
 ] as const
 
 export type ComplexWidgetMockType = (typeof COMPLEX_WIDGET_MOCK_TYPES)[number]
@@ -88,6 +101,12 @@ const MOCK_REGISTRY: Partial<Record<string, WidgetMockBundle>> = {
   'donut-chart': pieChartMock,
   statistic: statisticMock,
   descriptions: descriptionsMock,
+  'flow-timeline': flowTimelineMock,
+  calendar: calendarMock,
+  notification: notificationMock,
+  'dynamic-detail-table': dynamicDetailTableMock,
+  'compliance-checklist': complianceChecklistMock,
+  'qr-scanner': qrScannerMock,
 }
 
 export function getWidgetMock(type: string): WidgetMockBundle | undefined {

@@ -210,6 +210,45 @@ function getOptionLabel(options?: Array<{ label: string; value: unknown }>, valu
   return found?.label ?? String(value ?? '')
 }
 
+const FLOW_STATUS_COLOR: Record<string, string> = {
+  running: 'warning',
+  completed: 'success',
+  terminated: 'danger',
+  cancelled: 'info',
+}
+
+function getFlowStatusLabel(row: Record<string, unknown>): string {
+  const label = row.flowStatusLabel ?? row.flowStatus
+  if (label) return String(label)
+  return row.status != null ? String(row.status) : '—'
+}
+
+function getFlowStatusTagType(row: Record<string, unknown>): string {
+  const raw = String(row.flowStatus ?? '')
+  return FLOW_STATUS_COLOR[raw] ?? ''
+}
+
+const EXPIRY_COLOR: Record<string, string> = {
+  valid: 'success',
+  expiring: 'warning',
+  expired: 'danger',
+}
+
+function getExpiryLabel(row: Record<string, unknown>): string {
+  const status = String(row.expiryStatus ?? row.status ?? '')
+  if (status === 'expiring') return '即将到期'
+  if (status === 'expired') return '已过期'
+  if (status === 'valid') return '有效'
+  const days = row.daysUntilDue
+  if (typeof days === 'number' && days <= 30) return `${days} 天后到期`
+  return status || '—'
+}
+
+function getExpiryTagType(row: Record<string, unknown>): string {
+  const status = String(row.expiryStatus ?? row.status ?? '')
+  return EXPIRY_COLOR[status] ?? ''
+}
+
 // ---- Toolbar button visibility ----
 
 function isToolbarVisible(btn: ActionButton): boolean {
@@ -366,6 +405,26 @@ defineExpose({
               size="small"
             >
               {{ getOptionLabel(effectiveColumn(col).options as any, cellValue(row, col.prop)) }}
+            </el-tag>
+          </template>
+
+          <!-- flowStatus (E-13) -->
+          <template v-else-if="col.render === 'flowStatus'">
+            <el-tag
+              :type="getFlowStatusTagType(row) as any"
+              size="small"
+            >
+              {{ getFlowStatusLabel(row) }}
+            </el-tag>
+          </template>
+
+          <!-- expiryAlert (E-18) -->
+          <template v-else-if="col.render === 'expiryAlert'">
+            <el-tag
+              :type="getExpiryTagType(row) as any"
+              size="small"
+            >
+              {{ getExpiryLabel(row) }}
             </el-tag>
           </template>
 

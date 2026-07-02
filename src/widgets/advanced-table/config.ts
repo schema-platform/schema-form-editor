@@ -35,7 +35,7 @@ export interface AdvancedTableColumn {
   fixed?: 'left' | 'right'
   sortable?: boolean | 'custom'
   align?: 'left' | 'center' | 'right'
-  render?: 'text' | 'link' | 'tag' | 'badge' | 'image' | 'buttons' | 'custom'
+  render?: 'text' | 'link' | 'tag' | 'badge' | 'image' | 'buttons' | 'custom' | 'flowStatus'
   // tooltip
   showTooltip?: boolean
   tooltipField?: string

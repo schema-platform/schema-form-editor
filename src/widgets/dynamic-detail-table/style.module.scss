@@ -1,0 +1,22 @@
+.wrapper {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.table {
+  width: 100%;
+}

@@ -7,7 +7,7 @@
 import { ref, inject, onMounted, onUnmounted, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
 import { FORM_GRID_CONTEXT_KEY, FORM_GRID_FORM_KEY } from '@/components/WidgetRenderer/types'
 import type { SchemaApiConfig, DictItem, FormData } from '@/components/WidgetRenderer/types'
-import { requestExternalUrl } from '@/api/requestApi'
+import { fetchDictByCode } from '@/api/widgetApi'
 import { getCachedOptions, setCachedOptions } from '@/utils/optionsCache'
 import { normalizeListResponse } from '@/utils/responseNormalizer'
 import { executeWithRetry } from '@/utils/retryRequest'
@@ -54,13 +54,53 @@ export function useDynamicOptions(apiConfig: MaybeRefOrGetter<SchemaApiConfig | 
     const config = toValue(apiConfig)
     if (!config || isUnmounted) return
 
-    // 1. 优先从字典查找
-    if (config.dictCode && context?.global?.dictMap) {
-      const dictOptions = context.global.dictMap[config.dictCode]
-      if (dictOptions) {
-        options.value = dictOptions
+    // 1. 字典：context dictMap → API dictCode → dict:// URL
+    if (config.dictCode) {
+      if (context?.global?.dictMap?.[config.dictCode]) {
+        options.value = context.global.dictMap[config.dictCode]
         return
       }
+      loading.value = true
+      error.value = ''
+      try {
+        options.value = await fetchDictByCode(config.dictCode)
+      } catch (e: unknown) {
+        error.value = e instanceof Error ? e.message : '字典加载失败'
+      } finally {
+        loading.value = false
+      }
+      return
+    }
+
+    if (config.url?.startsWith('dict://')) {
+      const code = config.url.slice('dict://'.length)
+      loading.value = true
+      try {
+        options.value = await fetchDictByCode(code)
+      } finally {
+        loading.value = false
+      }
+      return
+    }
+
+    if (config.url === 'dept://tree') {
+      loading.value = true
+      try {
+        const res = await requestExternalUrl('get', '/depts', { tree: 'true' })
+        const { data: rawList } = normalizeListResponse(res, { dataPath: 'data' })
+        const mapTree = (items: Record<string, unknown>[]): DictItem[] =>
+          items.map((item) => ({
+            label: String(item.name ?? ''),
+            value: String(item.id ?? ''),
+            children: item.children && Array.isArray(item.children)
+              ? mapTree(item.children as Record<string, unknown>[])
+              : undefined,
+          }))
+        options.value = mapTree(rawList)
+      } finally {
+        loading.value = false
+      }
+      return
     }
 
     if (!config.url) return

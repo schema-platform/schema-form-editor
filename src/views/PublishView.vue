@@ -51,6 +51,17 @@ const isReadonly = computed(() => formMode.value === 'view')
 const schemaId = computed(() => route.query.id as string ?? '')
 const context = computed(() => appStore.formGridContext)
 
+/** A-08 — 可选 AI 侧边栏（query.aiSidebar=1 或 board 变量 enableAiSidebar） */
+const showAiSidebar = computed(() => {
+  if (route.query.aiSidebar === '1' || route.query.aiSidebar === 'true') return true
+  return boardVariables.value.enableAiSidebar === true || boardVariables.value.enableAiSidebar === 'true'
+})
+
+const aiSidebarUrl = computed(() => {
+  const ctx = (route.query.context as string) || (boardVariables.value.aiContext as string) || 'business'
+  return `/app/ai/sidebar?context=${encodeURIComponent(ctx)}`
+})
+
 /** 将 URL query 映射到画布变量（E-23） */
 function buildQueryVariables(query: Record<string, unknown>): Record<string, unknown> {
   const vars: Record<string, unknown> = {}
@@ -70,6 +81,9 @@ function buildQueryVariables(query: Record<string, unknown>): Record<string, unk
   for (const [key, val] of Object.entries(query)) {
     if (key.startsWith('var.')) {
       vars[key.slice(4)] = Array.isArray(val) ? val[0] : val
+    }
+    if (['flowInstanceId', 'taskId'].includes(key) && val !== undefined && val !== null && val !== '') {
+      vars[key] = Array.isArray(val) ? val[0] : val
     }
   }
   return vars
@@ -226,20 +240,24 @@ onUnmounted(() => window.removeEventListener('message', handleMessage))
       <p>{{ error }}</p>
     </div>
 
-    <WidgetRenderer
-      v-else
-      ref="formRef"
-      :schema="schema"
-      layout="absolute"
-      :canvas-config="canvasConfig"
-      :board-variables="boardVariables"
-      :user="context.user"
-      :request="context.request"
-      :global="context.global"
-      :readonly="isReadonly"
-      :editable-fields="formMode === 'partial' ? editableFields : undefined"
-      :readonly-fields="formMode === 'partial' ? readonlyFields : undefined"
-      @submit="handleSubmit"
-    />
+    <div v-else :class="[styles['fg-renderer'], showAiSidebar && styles['fg-renderer--with-sidebar']]">
+      <WidgetRenderer
+        ref="formRef"
+        :schema="schema"
+        layout="absolute"
+        :canvas-config="canvasConfig"
+        :board-variables="boardVariables"
+        :user="context.user"
+        :request="context.request"
+        :global="context.global"
+        :readonly="isReadonly"
+        :editable-fields="formMode === 'partial' ? editableFields : undefined"
+        :readonly-fields="formMode === 'partial' ? readonlyFields : undefined"
+        @submit="handleSubmit"
+      />
+      <aside v-if="showAiSidebar" :class="styles['fg-renderer__ai-sidebar']">
+        <iframe :src="aiSidebarUrl" title="AI 助手" :class="styles['fg-renderer__ai-iframe']" />
+      </aside>
+    </div>
   </div>
 </template>

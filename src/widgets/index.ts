@@ -68,6 +68,13 @@ import { FgRoleManagement, createRoleManagementWidget, roleManagementConfig } fr
 import { FgTreeSelect, createTreeSelectWidget, treeSelectConfig } from './tree-select'
 import { FgUserManagement, createUserManagementWidget, userManagementConfig } from './user-management'
 import { FgUserSelector, createUserSelectorWidget, userSelectorConfig } from './user-selector'
+import { FgFlowTimeline, createFlowTimelineWidget, flowTimelineConfig } from './flow-timeline'
+import { FgFlowTaskActions, createFlowTaskActionsWidget, flowTaskActionsConfig } from './flow-task-actions'
+import { FgCalendar, createCalendarWidget, calendarConfig } from './calendar'
+import { FgNotification, createNotificationWidget, notificationConfig } from './notification'
+import { FgDynamicDetailTable, createDynamicDetailTableWidget, dynamicDetailTableConfig } from './dynamic-detail-table'
+import { FgComplianceChecklist, createComplianceChecklistWidget, complianceChecklistConfig } from './compliance-checklist'
+import { FgQrScanner, createQrScannerWidget, qrScannerConfig } from './qr-scanner'
 
 export function registerAllWidgets() {
   // Layout widgets (结构布局)
@@ -439,5 +446,12 @@ export function registerAllWidgets() {
   registerWidget({ name: permissionTreeConfig.name, displayName: permissionTreeConfig.displayName, type: 'permission-tree', group: 'form', component: FgPermissionTree, create: createPermissionTreeWidget, config: permissionTreeConfig })
   registerWidget({ name: roleManagementConfig.name, displayName: roleManagementConfig.displayName, type: 'role-management', group: 'business', component: FgRoleManagement, create: createRoleManagementWidget, config: roleManagementConfig })
   registerWidget({ name: userManagementConfig.name, displayName: userManagementConfig.displayName, type: 'user-management', group: 'business', component: FgUserManagement, create: createUserManagementWidget, config: userManagementConfig })
+  registerWidget({ name: flowTimelineConfig.name, displayName: flowTimelineConfig.displayName, type: 'flow-timeline', group: 'business', component: FgFlowTimeline, create: createFlowTimelineWidget, config: flowTimelineConfig })
+  registerWidget({ name: flowTaskActionsConfig.name, displayName: flowTaskActionsConfig.displayName, type: 'flow-task-actions', group: 'business', component: FgFlowTaskActions, create: createFlowTaskActionsWidget, config: flowTaskActionsConfig })
+  registerWidget({ name: calendarConfig.name, displayName: calendarConfig.displayName, type: 'calendar', group: 'business', component: FgCalendar, create: createCalendarWidget, config: calendarConfig })
+  registerWidget({ name: notificationConfig.name, displayName: notificationConfig.displayName, type: 'notification', group: 'business', component: FgNotification, create: createNotificationWidget, config: notificationConfig })
+  registerWidget({ name: dynamicDetailTableConfig.name, displayName: dynamicDetailTableConfig.displayName, type: 'dynamic-detail-table', group: 'form', component: FgDynamicDetailTable, create: createDynamicDetailTableWidget, config: dynamicDetailTableConfig })
+  registerWidget({ name: complianceChecklistConfig.name, displayName: complianceChecklistConfig.displayName, type: 'compliance-checklist', group: 'business', component: FgComplianceChecklist, create: createComplianceChecklistWidget, config: complianceChecklistConfig })
+  registerWidget({ name: qrScannerConfig.name, displayName: qrScannerConfig.displayName, type: 'qr-scanner', group: 'form', component: FgQrScanner, create: createQrScannerWidget, config: qrScannerConfig })
   registerWidget({ name: userSelectorConfig.name, displayName: userSelectorConfig.displayName, type: 'user-selector', group: 'business', component: FgUserSelector, create: createUserSelectorWidget, config: userSelectorConfig })
 }
