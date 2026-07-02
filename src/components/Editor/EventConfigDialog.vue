@@ -80,6 +80,7 @@ const actionTypeOptions: ActionTypeOption[] = [
   { label: '关闭页签', value: 'close-tab' },
   { label: '发起流程', value: 'startFlow' },
   { label: '结束流程', value: 'endFlow' },
+  { label: '提交表单数据', value: 'submitSubmission' },
 ]
 
 // ---- 根据目标组件获取可接收事件 ----

@@ -38,6 +38,7 @@ import { useFormData } from '@/composables/useFormData'
 import { useLifecycle } from '@/composables/useLifecycle'
 import { useLocale } from '@/composables/useLocale'
 import { useLogger } from '@/composables/useLogger'
+import { WIDGET_SURFACE_KEY } from '@/widgets/base/widgetMock'
 import { fetchRuntimeUrl } from '@/api/runtimeApi'
 import { triggerWidgetEvent } from '@/engine/eventEngine'
 import styles from './style.module.scss'
@@ -238,6 +239,8 @@ provide('exposedContext', exposedContext)
 const { stateMap: linkageStateMap } = useLinkage(props.schema, formData, variablesContext, exposedContext)
 provide(FORM_GRID_LINKAGE_KEY, linkageStateMap)
 
+provide(WIDGET_SURFACE_KEY, 'runtime')
+
 // ---- 弹窗注册表（WidgetNode 注册 dialog 回调，eventContext.openDialog 消费） ----
 const dialogRegistry: DialogRegistry = new Map()
 const lastOpenedDialogId = ref<string | undefined>(undefined)
@@ -301,6 +304,7 @@ const eventContext: EventExecutionContext = {
     dialogVisible.value = false
   },
   submitForm: () => { submit() },
+  validateForm: async () => validate(),
   resetForm: () => { resetFields() },
   getFormData: () => formData,
   emit: (eventName: string, payload?: unknown) => {

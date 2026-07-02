@@ -10,6 +10,7 @@ import { useLogger } from '@/composables/useLogger'
 import { checkSecurity } from '@/utils/expression'
 import { apiClient } from '@/utils/apiClient'
 import { startFlow, terminateFlow } from '@/api/dataApi'
+import { createSubmission } from '@/utils/apiClient'
 
 const logger = useLogger('EventEngine')
 
@@ -53,6 +54,8 @@ export interface EventExecutionContext {
   closeDialog: () => void
   /** 提交表单 */
   submitForm: () => void
+  /** 校验表单（可选，运行时提供） */
+  validateForm?: () => Promise<boolean>
   /** 重置表单 */
   resetForm: () => void
   /** 获取表单数据 */
@@ -193,7 +196,10 @@ export async function executeEventAction(
     case 'api': {
       if (action.apiUrl) {
         const method = action.apiMethod ?? 'post'
-        const params = action.apiParams === 'formData' ? ctx.getFormData() : action.apiParams
+        let params: unknown = action.apiParams === 'formData' ? ctx.getFormData() : action.apiParams
+        if (action.apiParams === 'formData' && method !== 'get') {
+          params = { data: params }
+        }
         logger.api(`请求: ${method} ${action.apiUrl}`)
         try {
           const response = await apiClient.requestUrl<unknown>(method, action.apiUrl, params)
@@ -203,6 +209,37 @@ export async function executeEventAction(
           logger.warn(`响应失败: ${action.apiUrl}`, err)
           ctx.emit('api-error', { url: action.apiUrl, error: String(err) })
         }
+      }
+      break
+    }
+    case 'submitSubmission': {
+      if (!action.schemaId) {
+        logger.warn('submitSubmission: 缺少 schemaId')
+        break
+      }
+      if (ctx.validateForm) {
+        const valid = await ctx.validateForm()
+        if (!valid) {
+          logger.warn('submitSubmission: 表单校验未通过')
+          break
+        }
+      }
+      const data = ctx.getFormData()
+      logger.api(`提交表单: schemaId=${action.schemaId}`)
+      try {
+        const response = await createSubmission(action.schemaId, data)
+        logger.api('提交成功', response)
+        ctx.emit('submission-created', { schemaId: action.schemaId, response })
+        if (action.definitionId) {
+          const flowResponse = await startFlow(action.definitionId, {
+            submissionId: response.id,
+            ...action.variables,
+          })
+          ctx.emit('flow-started', { definitionId: action.definitionId, response: flowResponse })
+        }
+      } catch (err) {
+        logger.warn('submitSubmission 失败', err)
+        ctx.emit('api-error', { action: 'submitSubmission', schemaId: action.schemaId, error: String(err) })
       }
       break
     }

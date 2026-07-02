@@ -33,6 +33,8 @@ interface UIAction {
   // ---- startFlow ----
   definitionId: string
   flowVariables: string
+  // ---- submitSubmission ----
+  schemaId: string
   // ---- endFlow ----
   instanceId: string
   reason: string
@@ -97,6 +99,7 @@ function convertSchemaToUi(action: SchemaEventAction): UIAction {
     eventName: action.event ?? '',
     definitionId: action.definitionId ?? '',
     flowVariables: action.variables ? JSON.stringify(action.variables) : '',
+    schemaId: action.schemaId ?? '',
     instanceId: action.instanceId ?? '',
     reason: action.reason ?? '',
   }
@@ -154,6 +157,13 @@ function convertUiToSchema(a: UIAction): SchemaEventAction | null {
         definitionId: a.definitionId,
         variables: a.flowVariables ? JSON.parse(a.flowVariables) : undefined,
       }
+    case 'submitSubmission':
+      return {
+        type: 'submitSubmission',
+        schemaId: a.schemaId,
+        definitionId: a.definitionId || undefined,
+        variables: a.flowVariables ? JSON.parse(a.flowVariables) : undefined,
+      }
     case 'endFlow':
       return {
         type: 'endFlow',
@@ -202,6 +212,7 @@ function addAction() {
     eventName: '',
     definitionId: '',
     flowVariables: '',
+    schemaId: '',
     instanceId: '',
     reason: '',
   })
@@ -226,6 +237,7 @@ function handleTypeChange(action: UIAction, newType: UIActionType) {
   action.navigatePath = ''
   action.definitionId = ''
   action.flowVariables = ''
+  action.schemaId = ''
   action.instanceId = ''
   action.reason = ''
   emitChange()
@@ -517,6 +529,37 @@ function handleChange() {
           <el-input
             v-model="action.text"
             placeholder="复制内容（支持 formData.xxx）"
+            style="flex: 1"
+            @update:model-value="handleChange"
+          />
+        </div>
+      </template>
+
+      <!-- submitSubmission: schemaId + optional flow -->
+      <template v-if="action.type === 'submitSubmission'">
+        <div :class="styles.row">
+          <label :class="styles.label">Schema ID</label>
+          <el-input
+            v-model="action.schemaId"
+            placeholder="sourceId 或 publishId"
+            style="flex: 1"
+            @update:model-value="handleChange"
+          />
+        </div>
+        <div :class="styles.row">
+          <label :class="styles.label">流程定义</label>
+          <el-input
+            v-model="action.definitionId"
+            placeholder="可选，提交后自动发起流程"
+            style="flex: 1"
+            @update:model-value="handleChange"
+          />
+        </div>
+        <div :class="styles.row">
+          <label :class="styles.label">流程变量</label>
+          <el-input
+            v-model="action.flowVariables"
+            placeholder='{"key": "value"}（可选）'
             style="flex: 1"
             @update:model-value="handleChange"
           />

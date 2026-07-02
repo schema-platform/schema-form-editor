@@ -710,6 +710,17 @@ export async function fetchSubmissionDetail(schemaId: string, id: string): Promi
   )
 }
 
+/** 创建表单提交记录（POST body: { data }） */
+export async function createSubmission(
+  schemaId: string,
+  data: Record<string, unknown>,
+): Promise<SubmissionItem> {
+  return apiClient.post<SubmissionItem>(
+    `/submissions/${encodeURIComponent(schemaId)}`,
+    { data },
+  )
+}
+
 export async function deleteSubmission(schemaId: string, id: string): Promise<null> {
   return apiClient.delete<null>(
     `/submissions/${encodeURIComponent(schemaId)}/${encodeURIComponent(id)}`,

@@ -14,8 +14,10 @@ vi.mock('@/composables/useLogger', () => ({
 }))
 
 const mockRequestUrl = vi.fn()
+const mockCreateSubmission = vi.fn()
 vi.mock('@/utils/apiClient', () => ({
   apiClient: { requestUrl: (...args: unknown[]) => mockRequestUrl(...args) },
+  createSubmission: (...args: unknown[]) => mockCreateSubmission(...args),
 }))
 
 describe('evaluateCondition', () => {
@@ -91,6 +93,7 @@ describe('executeEventAction', () => {
   beforeEach(() => {
     ctx = createMockContext()
     mockRequestUrl.mockReset()
+    mockCreateSubmission.mockReset()
   })
 
   // ---- 基础动作测试 ----
@@ -291,11 +294,11 @@ describe('executeEventAction', () => {
       expect(mockRequestUrl).toHaveBeenCalledWith('post', '/api/users', undefined)
     })
 
-    it('sends formData as params when apiParams is "formData"', async () => {
+    it('sends formData wrapped as { data } when apiParams is "formData"', async () => {
       ctx = createMockContext({ getFormData: vi.fn().mockReturnValue({ name: 'test' }) })
       mockRequestUrl.mockResolvedValue({})
       await executeEventAction({ type: 'api', apiUrl: '/api/save', apiParams: 'formData' }, ctx)
-      expect(mockRequestUrl).toHaveBeenCalledWith('post', '/api/save', { name: 'test' })
+      expect(mockRequestUrl).toHaveBeenCalledWith('post', '/api/save', { data: { name: 'test' } })
     })
 
     it('emits api-error on request failure', async () => {
@@ -313,6 +316,53 @@ describe('executeEventAction', () => {
     it('does nothing if apiUrl is missing', () => {
       executeEventAction({ type: 'api' }, ctx)
       expect(ctx.emit).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('submitSubmission', () => {
+    it('validates, posts { data }, emits submission-created', async () => {
+      const validateForm = vi.fn().mockResolvedValue(true)
+      ctx = createMockContext({
+        validateForm,
+        getFormData: vi.fn().mockReturnValue({ leaveType: 'annual' }),
+      })
+      mockCreateSubmission.mockResolvedValue({ id: 'sub-1', schemaId: 'schema-leave' })
+      await executeEventAction({
+        type: 'submitSubmission',
+        schemaId: 'schema-leave',
+      }, ctx)
+      expect(validateForm).toHaveBeenCalled()
+      expect(mockCreateSubmission).toHaveBeenCalledWith('schema-leave', { leaveType: 'annual' })
+      expect(ctx.emit).toHaveBeenCalledWith('submission-created', {
+        schemaId: 'schema-leave',
+        response: { id: 'sub-1', schemaId: 'schema-leave' },
+      })
+    })
+
+    it('starts flow when definitionId is set', async () => {
+      ctx = createMockContext({
+        getFormData: vi.fn().mockReturnValue({ days: 3 }),
+      })
+      mockCreateSubmission.mockResolvedValue({ id: 'sub-2' })
+      mockRequestUrl.mockResolvedValue({ id: 'flow-1' })
+      await executeEventAction({
+        type: 'submitSubmission',
+        schemaId: 'schema-leave',
+        definitionId: 'def-leave',
+        variables: { dept: '研发' },
+      }, ctx)
+      expect(mockRequestUrl).toHaveBeenCalledWith('post', '/flow-instances', {
+        definitionId: 'def-leave',
+        variables: { submissionId: 'sub-2', dept: '研发' },
+      })
+    })
+
+    it('skips when validation fails', async () => {
+      ctx = createMockContext({
+        validateForm: vi.fn().mockResolvedValue(false),
+      })
+      await executeEventAction({ type: 'submitSubmission', schemaId: 'x' }, ctx)
+      expect(mockCreateSubmission).not.toHaveBeenCalled()
     })
   })
 

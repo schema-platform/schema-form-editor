@@ -35,6 +35,7 @@ const appStore = useAppStore()
 
 const schema = ref<PartialWidget[]>([])
 const canvasConfig = ref<{ width?: number; height?: number; widthUnit?: 'px' | '%'; heightUnit?: 'px' | '%'; backgroundColor?: string; padding?: string; zoom?: number }>({})
+const boardVariables = ref<Record<string, unknown>>({})
 const loading = ref(true)
 const error = ref('')
 const schemaName = ref('')
@@ -50,11 +51,49 @@ const isReadonly = computed(() => formMode.value === 'view')
 const schemaId = computed(() => route.query.id as string ?? '')
 const context = computed(() => appStore.formGridContext)
 
+/** 将 URL query 映射到画布变量（E-23） */
+function buildQueryVariables(query: Record<string, unknown>): Record<string, unknown> {
+  const vars: Record<string, unknown> = {}
+  const aliasMap: Record<string, string> = {
+    recordId: 'recordId',
+    submissionId: 'recordId',
+    id: 'recordId',
+    mode: 'mode',
+    flowDef: 'flowDefinitionId',
+    flowDefinitionId: 'flowDefinitionId',
+  }
+  for (const [key, target] of Object.entries(aliasMap)) {
+    const val = query[key]
+    if (val !== undefined && val !== null && val !== '') {
+      vars[target] = Array.isArray(val) ? val[0] : val
+    }
+  }
+  for (const [key, val] of Object.entries(query)) {
+    if (key.startsWith('var.')) {
+      vars[key.slice(4)] = Array.isArray(val) ? val[0] : val
+    }
+  }
+  return vars
+}
+
+/** 将 board.variables 数组转为运行时 map */
+function boardVariablesToMap(
+  variables?: Array<{ name: string; defaultValue?: unknown }>,
+): Record<string, unknown> {
+  const map: Record<string, unknown> = {}
+  if (!variables?.length) return map
+  for (const v of variables) {
+    if (v.name) map[v.name] = v.defaultValue
+  }
+  return map
+}
+
 async function loadSchema(id: string) {
   loading.value = true
   error.value = ''
   schema.value = []
   schemaName.value = ''
+  boardVariables.value = {}
 
   try {
     // 优先按 publishId 查找，找不到再按 sourceId 查找
@@ -73,6 +112,13 @@ async function loadSchema(id: string) {
     } else {
       schema.value = raw?.widgets ?? []
       canvasConfig.value = raw?.board?.canvas ?? {}
+      boardVariables.value = {
+        ...boardVariablesToMap(raw?.board?.variables),
+        ...buildQueryVariables(route.query as Record<string, unknown>),
+      }
+    }
+    if (Array.isArray(raw)) {
+      boardVariables.value = buildQueryVariables(route.query as Record<string, unknown>)
     }
     schemaName.value = publishedSchema.name
   } catch (err: unknown) {
@@ -176,6 +222,7 @@ onUnmounted(() => window.removeEventListener('message', handleMessage))
       :schema="schema"
       layout="absolute"
       :canvas-config="canvasConfig"
+      :board-variables="boardVariables"
       :user="context.user"
       :request="context.request"
       :global="context.global"
